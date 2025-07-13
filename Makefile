@@ -1,16 +1,17 @@
 PLATFORM_IOS = iOS Simulator,name=iPad mini (A17 Pro)
 PLATFORM_MACOS = macOS
 XCCOV = xcrun xccov view --report --only-targets
+SCHEME = auv3-support-Package
 
 default: report
 
 test-iOS:
 	rm -rf "$(PWD)/.DerivedData-iOS"
-	USE_UNSAFE_FLAGS="1" xcodebuild test \
-		-scheme auv3-support \
+	USE_UNSAFE_FLAGS="1" set -o pipefail && xcodebuild test \
+		-scheme "$(SCHEME)" \
 		-derivedDataPath "$(PWD)/.DerivedData-iOS" \
 		-destination platform="$(PLATFORM_IOS)" \
-		-enableCodeCoverage YES
+		-enableCodeCoverage YES | xcbeautify --renderer github-actions
 
 coverage-iOS: test-iOS
 	$(XCCOV) $(PWD)/.DerivedData-iOS/Logs/Test/*.xcresult > coverage_iOS.txt
@@ -24,11 +25,11 @@ percentage-iOS: coverage-iOS
 
 test-macOS:
 	rm -rf "$(PWD)/.DerivedData-macOS"
-	USE_UNSAFE_FLAGS="1" xcodebuild test \
-		-scheme DSPHeaders \
+	USE_UNSAFE_FLAGS="1" set -o pipefail && xcodebuild test \
+		-scheme "$(SCHEME)" \
 		-derivedDataPath "$(PWD)/.DerivedData-macOS" \
 		-destination platform="$(PLATFORM_MACOS)" \
-		-enableCodeCoverage YES
+		-enableCodeCoverage YES | xcbeautify --renderer github-actions
 
 coverage-macOS: test-macOS
 	$(XCCOV) $(PWD)/.DerivedData-macOS/Logs/Test/*.xcresult > coverage_macOS.txt

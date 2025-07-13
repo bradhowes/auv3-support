@@ -40,7 +40,6 @@ let package = Package(
         "AUv3Shared",
         "DSPHeaders"
       ],
-      cxxSettings: [.unsafeFlags(flags)],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
         .interoperabilityMode(.Cxx)
@@ -49,7 +48,12 @@ let package = Package(
     .testTarget(
       name: "AUv3HostTests",
       dependencies: [
-        "AUv3Host"
+        "AUv3Host",
+        "DSPHeaders"
+      ],
+      swiftSettings: [
+        .define("APPLICATION_EXTENSION_API_ONLY"),
+        .interoperabilityMode(.Cxx)
       ]
     ),
   ],
