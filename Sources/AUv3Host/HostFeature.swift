@@ -31,12 +31,15 @@ public struct HostFeature {
     var initialNotice: String?
 
     public init(config: HostConfig) {
+      let seenNotice = config.defaults.bool(forKey: "seenInitialNotice")
+      config.defaults.set(true, forKey: "seenInitialNotice")
+
       themeControlColor = config.themeControlColor
       themeLabelColor = config.themeLabelColor
       sampleLoop = config.sampleLoop
       version = config.version
       appStoreId = config.appStoreId
-      initialNotice = config.initialNotice
+      initialNotice = (!seenNotice || config.alwaysShowNotice) ? config.initialNotice : nil
       loader = .init(componentDescription: config.componentDescription, maxWait: config.maxWait)
       engine = .init()
       presets = .init(source: nil)
