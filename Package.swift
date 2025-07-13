@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-  name: "AUv3Host",
+  name: "auv3-support",
   platforms: [.iOS(.v18), .macOS(.v15)],
   products: [
     .library(name: "AUv3Hosting", targets: ["AUv3Host"]),
