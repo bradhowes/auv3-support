@@ -124,36 +124,46 @@ public struct HostView: View {
       return 48
     }
 
-    ZStack {
-      VStack {
-        HStack(spacing: 12) {
-          EngineView(store: store.scope(state: \.engine, action: \.engine))
-          PresetsFactorySegmentedControl(store: store.scope(state: \.presets, action: \.presets))
-        }
-        PresetsMenu(store: store.scope(state: \.presets, action: \.presets))
-          .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-        ZStack(alignment: .bottomTrailing) {
-          AudioUnitLoaderView(store: store.scope(state: \.loader, action: \.loader))
-          if let auViewController = store.auViewController {
-            EmbeddedViewController(auViewController: auViewController)
-          }
-          Button(store.version) { store.send(.versionButtonTapped) }
-            .tint(store.themeLabelColor)
-            .font(.footnote)
-            .padding([.trailing, .bottom], 8)
-        }
-        .padding([.top], 8)
+    VStack {
+      HStack(spacing: 12) {
+        EngineView(store: store.scope(state: \.engine, action: \.engine))
+        PresetsFactorySegmentedControl(store: store.scope(state: \.presets, action: \.presets))
       }
-      .background(.black)
-      if let notice = store.initialNotice {
+      PresetsMenu(store: store.scope(state: \.presets, action: \.presets))
+        .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+      ZStack(alignment: .bottomTrailing) {
+        AudioUnitLoaderView(store: store.scope(state: \.loader, action: \.loader))
+        if let auViewController = store.auViewController {
+          EmbeddedViewController(auViewController: auViewController)
+        }
+        Button(store.version) { store.send(.versionButtonTapped) }
+          .tint(store.themeLabelColor)
+          .font(.footnote)
+          .padding([.trailing, .bottom], 8)
+      }
+      .padding([.top], 8)
+    }
+    .disabled(store.initialNotice != nil)
+    .background(.black)
+    .overlay {
+      if store.initialNotice != nil {
         // Dim the audio unit and host controls and block interaction with them while the notice is shown
         Rectangle()
           .fill(Color.black.opacity(0.5))
-        initiallNotice(notice: notice)
       }
     }
+    .overlay {
+      if let notice = store.initialNotice {
+        initiallNotice(notice: notice)
+          .transition(.push(from: .bottom))
+      }
+    }
+    .animation(.default, value: store.initialNotice)
     .padding([.leading, .trailing], 8)
     .environment(\.colorScheme, .dark)
+#if os(iOS)
+    .ignoresSafeArea(.keyboard)
+#endif
   }
 
   var spacer: some View {
