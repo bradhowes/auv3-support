@@ -20,36 +20,23 @@ public final class SimplePlayEngine: @unchecked Sendable {
 
   private let engine = AVAudioEngine()
   private let player = AVAudioPlayerNode()
-  private let stateChangeQueue = DispatchQueue(label: "SimplePlayEngine")
+  private let stateChangeQueue = DispatchQueue(
+    label: "SimplePlayEngine.stateChangeQueue",
+    attributes: [],
+    autoreleaseFrequency: .inherit,
+    target: DispatchQueue.global(qos: .userInitiated)
+  )
 
   private var activeEffect: AVAudioUnit? {
     didSet { wireAudioPath() }
   }
 
   public var isConnected: Bool { activeEffect != nil }
+  private var buffer: AVAudioPCMBuffer? { didSet { wireAudioPath() } }
 
-  public var file: AVAudioFile? {
-    didSet { wireAudioPath() }
-  }
-
-  /// True if engine is currently playing the audio file.
-  public var isPlaying: Bool { stateChangeQueue.sync { player.isPlaying } }
-  public var maximumFramesToRender: AUAudioFrameCount { engine.mainMixerNode.auAudioUnit.maximumFramesToRender }
-
-  static func audioFileResource(name: String) -> AVAudioFile {
-    let parts = name.split(separator: .init("."))
-    let filename = String(parts[0])
-    let ext = String(parts[1])
-
-    let bundles = Bundle.allBundles
-    for bundle in bundles {
-      if let url = bundle.url(forResource: filename, withExtension: ext) {
-        return try! AVAudioFile(forReading: url)
-      }
-    }
-
-    fatalError("\(filename).\(ext) missing from bundle")
-  }
+  /// True if user commanded engine to play audio loop.
+  private var isPlaying: Bool = false
+  private var maximumFramesToRender: AUAudioFrameCount { engine.mainMixerNode.auAudioUnit.maximumFramesToRender }
 
   /**
    Create new audio processing setup, with an audio file player for a signal source.
@@ -64,29 +51,35 @@ public final class SimplePlayEngine: @unchecked Sendable {
    - parameter sampleLoop: the audio resource to play
    */
   public func setSampleLoop(_ sampleLoop: SampleLoop) {
-    self.file = Self.audioFileResource(name: sampleLoop.rawValue)
+    let file = Bundle.audioFileResource(name: sampleLoop.rawValue)
+    file.framePosition = 0
+    guard let buffer = AVAudioPCMBuffer(
+      pcmFormat: file.processingFormat,
+      frameCapacity: AVAudioFrameCount(file.length)
+    ) else {
+      fatalError("failed to load sample into memory")
+    }
+
+    self.buffer = buffer
+    try! file.read(into: buffer)
   }
 
   @discardableResult
   private func wireAudioPath() -> Bool {
-    guard let file else { return false }
+    guard let buffer else { return false }
     if let activeEffect {
       activeEffect.auAudioUnit.maximumFramesToRender = maximumFramesToRender
       engine.attach(activeEffect)
       engine.disconnectNodeOutput(player)
-      engine.connect(player, to: activeEffect, format: file.processingFormat)
-      engine.connect(activeEffect, to: engine.mainMixerNode, format: file.processingFormat)
+      engine.connect(player, to: activeEffect, format: buffer.format)
+      engine.connect(activeEffect, to: engine.mainMixerNode, format: buffer.format)
     } else {
       engine.disconnectNodeOutput(player)
-      engine.connect(player, to: engine.mainMixerNode, format: file.processingFormat)
+      engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
     }
 
-    do {
-      try engine.start()
-      return true
-    } catch {
-      return false
-    }
+    engine.prepare()
+    return true
   }
 }
 
@@ -107,7 +100,9 @@ extension SimplePlayEngine {
    Start playback of the audio file player.
    */
   public func start() {
-    stateChangeQueue.sync {
+    self.isPlaying = true
+    activeEffect?.auAudioUnit.shouldBypassEffect = false
+    stateChangeQueue.async {
       self.startPlaying()
     }
   }
@@ -116,7 +111,8 @@ extension SimplePlayEngine {
    Stop playback of the audio file player.
    */
   public func stop() {
-    stateChangeQueue.sync {
+    self.isPlaying = false
+    stateChangeQueue.async {
       self.stopPlaying()
     }
   }
@@ -144,7 +140,6 @@ extension SimplePlayEngine {
 
   private func startPlaying() {
     updateAudioSession(active: true)
-
     do {
       try engine.start()
     } catch {
@@ -153,6 +148,7 @@ extension SimplePlayEngine {
     }
 
     beginLoop()
+    player.prepare(withFrameCount: maximumFramesToRender)
     player.play()
   }
 
@@ -166,28 +162,26 @@ extension SimplePlayEngine {
 extension SimplePlayEngine {
 
   private func updateAudioSession(active: Bool) {
-    #if os(iOS)
+#if os(iOS)
     let session = AVAudioSession.sharedInstance()
     do {
-      try session.setCategory(.playback, mode: .default)
+      if active {
+        try session.setCategory(.playback, mode: .default, options: [])
+      }
       try session.setActive(active)
     } catch {
       fatalError("Could not set Audio Session active \(active). error: \(error).")
     }
-    #endif
+#endif
   }
 
   /**
    Start playing the audio resource and play it again once it is done.
    */
   private func beginLoop() {
-    guard let file else { return }
-    player.scheduleFile(file, at: nil) {
-      self.stateChangeQueue.async {
-        if self.player.isPlaying {
-          self.beginLoop()
-        }
-      }
+    guard let buffer, isPlaying else { return }
+    player.scheduleBuffer(buffer, at: nil) {
+      self.stateChangeQueue.async { self.beginLoop() }
     }
   }
 }
