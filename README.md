@@ -27,7 +27,11 @@ App" template. The app serves as a simple AUv3 host to play audio samples throug
 gain control. There is a circular knob that controls the gain of the effect. The knob comes from my [AUv3Controls[ac]
 package, and it is served from the AUv3 component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift).
 
-![](media/AUv3Demo.png)
+<img src="media/AUv3Demo.png" width="200">
+
+
+<img src="media/Menu.png" width="200">
+
 
 ## History
 
