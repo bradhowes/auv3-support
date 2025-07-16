@@ -13,7 +13,8 @@ import os.log
  of the elements specific to a particular filter/effect are found elsewhere.
 
  The actual filtering logic resides in the Kernel C++ code which is abstracted away as an `AudioRenderer` entity.
- Similarly, parameters for controlling the filter are provided by an abstract `ParameterSource` entity.
+ Similarly, parameters for controlling the filter are provided by an abstract `ParameterSource` entity. The rest of the
+ code is in support of the AUv3 interface.
  */
 public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
 

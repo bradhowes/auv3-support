@@ -25,7 +25,9 @@ public enum FilterAudioUnitFactory {
   }
 
   /**
-   Create a new FilterAudioUnit instance to run in an AUv3 container.
+   Create a new FilterAudioUnit instance to run in an AUv3 container. Unlike the other method, this one
+   performs a call to `configure` so that at the end, the resulting audio unit is properly initialized and ready to
+   be used.
 
    - parameter componentDescription: descriptions of the audio environment it will run in
    - parameter parameters: provider of AUParameter values that define the runtime parameters for the audio unit

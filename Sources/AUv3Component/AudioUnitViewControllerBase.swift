@@ -33,7 +33,6 @@ public protocol HostingControllerFactory {
      else {
        fatalError("failed to get gain parameter")
      }
-
      return .init(rootView: .init(gain: gain))
    }
  }
@@ -55,6 +54,30 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
     }
   }
 
+  /**
+   Set the audioUnit property from a non-isolated call chain. This should be safe as this is the sole way of
+   manipulating the value. However, the attribute is open to manipulation since there is no `protected` access
+   in Swift to keep non-derived classes from manipulating it.
+
+   - parameter audioUnit: the audio unit to install
+   - returns the given audio unit value for easy chaining
+   */
+  @discardableResult nonisolated
+  public func installAudioUnit(_ audioUnit: FilterAudioUnit) -> FilterAudioUnit {
+    // Better way to do this? We are the only one that can set this, so maybe safe (?)
+    nonisolated(unsafe) let obj = self
+    DispatchQueue.main.async {
+      precondition(obj.audioUnit == nil, "unexpectedly re-installing audioUnit property")
+      obj.audioUnit = audioUnit
+    }
+    return audioUnit
+  }
+
+  /**
+   Continue initialization of the view using a valid FilterAudioUnit
+
+   - parameter audioUnit: the FilterAudioUnit instance to work with
+   */
   private func configureSwiftUIView(audioUnit: FilterAudioUnit) {
     if let host = hostingController {
       host.removeFromParent()

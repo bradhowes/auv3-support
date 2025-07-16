@@ -22,7 +22,7 @@ Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][d
 ## History
 
 This is an update of my [AUv3Support][old] package which used UIKit and AppKit and included the DSPHeaders package. This
-new package relies on SwiftUI and the hosting app is much more modularized using the [the Composable Architecture][tca]
+new package relies on SwiftUI and the hosting app is much more modularized using [The Composable Architecture][tca]
 framework.
 
 Otherwise, the functionality remains pretty much the same between the two packages.
