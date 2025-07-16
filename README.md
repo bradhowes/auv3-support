@@ -27,11 +27,20 @@ App" template. The app serves as a simple AUv3 host to play audio samples throug
 gain control. There is a circular knob that controls the gain of the effect. The knob comes from my [AUv3Controls[ac]
 package, and it is served from the AUv3 component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift).
 
-<img src="media/AUv3Demo.png" width="200">
+<img src="media/AUv3Demo.png" width="300">
 
+The "play" button starts/stops audio. The button next to it is the _bypass_ that controls whether the effect affects the
+audio output. The last control provides quick access to the "factory" presets. This control attempts to mimic Apple's
+own segmented control but supports accented coloring (see [the repo][sc] for details). 
 
-<img src="media/Menu.png" width="200">
+Below these controls there is text showing the name of the current preset. Touching that reveals a menu showing all
+known presets as well as controls for managing user presets. You can create your own presets, update them with new
+values, rename them, and delete them.
 
+<img src="media/Menu.png" width="300">
+
+The last control is at the lower-right of the screen showing the version of the AUv3 application extension. When
+touched, the default behavior is to show the App Store entry for the AUv3 component.
 
 ## History
 
@@ -48,3 +57,4 @@ Otherwise, the functionality remains pretty much the same between the two packag
 [old]: https://github.com/bradhowes/AUv3Support
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [ac]: https://github.com/bradhowes/AUv3Controls
+[sc]: https://github.com/bradhowes/brh-segmented-control
