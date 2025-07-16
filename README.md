@@ -26,3 +26,7 @@ new package relies on SwiftUI and the hosting app is much more modularized using
 framework.
 
 Otherwise, the functionality remains pretty much the same between the two packages.
+
+[dh]: https://github.com/bradhowes/DSPHeaders
+[old]: https://github.com/bradhowes/AUv3Support
+[tca]: https://github.com/pointfreeco/swift-composable-architecture
