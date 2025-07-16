@@ -18,11 +18,7 @@ public enum FilterAudioUnitFactory {
     componentDescription: AudioComponentDescription,
     viewConfigurationManager: AudioUnitViewConfigurationManager? = nil
   ) throws -> FilterAudioUnit {
-#if os(macOS)
-    let options: AudioComponentInstantiationOptions = .loadInProcess
-#else
     let options: AudioComponentInstantiationOptions = .loadOutOfProcess
-#endif
     let audioUnit = try FilterAudioUnit(componentDescription: componentDescription, options: options)
     audioUnit.viewConfigurationManager = viewConfigurationManager
     return audioUnit

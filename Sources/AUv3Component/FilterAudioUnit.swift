@@ -20,9 +20,9 @@ public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
   private let log: OSLog = OSLog(subsystem: "com.braysoftware.AUv3Support", category: "FilterAudioUnit")
 
   /// Initial sample rate when initialized
-  static private let defaultSampleRate: Double = 44100.0
+  static private let defaultSampleRate: Double = 44_100.0
   /// Maximum number of channels to support per audio bus
-  static private let audioBusMaxNumberOfChannels: UInt32 = 8
+  static private let audioBusMaxNumberOfChannels: UInt32 = 2
   /// Default channel layout to use in each audio bus
   static private let audioBusChannelLayout = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_Stereo)!
   /// Default audio format to use in each audio bus
@@ -67,15 +67,9 @@ public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
    */
   @objc override public init(
     componentDescription: AudioComponentDescription,
-    options: AudioComponentInstantiationOptions = []
+    options: AudioComponentInstantiationOptions
   ) throws {
     os_log(.info, log: log, "init - BEGIN %ld", componentDescription.componentFlags)
-
-    // Treat all 1s componentFlagsMask as error -- used for testing. NOTE: at least on macOS 13.0.1 this can be non-zero
-    // (30) which is counter to what the documentation states.
-    if componentDescription.componentFlags == UInt32.max {
-      throw Failure.unableToInitialize(String(describing: AVAudioFormat.self))
-    }
 
     inputBus = try Self.makeAudioBus()
     outputBus = try Self.makeAudioBus()
@@ -212,8 +206,6 @@ extension FilterAudioUnit {
       throw NSError(domain: NSOSStatusErrorDomain, code: Int(kAudioUnitErr_FailedInitialization), userInfo: nil)
     }
 
-    try super.allocateRenderResources()
-
     if outputBus.format.channelCount != inputBus.format.channelCount {
       setRenderResourcesAllocated(false)
 
@@ -226,6 +218,8 @@ extension FilterAudioUnit {
     // Acquire the sample rate and additional format parameter from the output bus we write output to. The host can
     // change the format at will before calling allocateRenderResources.
     kernel.setRenderingFormat(outputBusses.count, outputBus.format, maximumFramesToRender)
+
+    try super.allocateRenderResources()
 
     os_log(.info, log: log, "allocateRenderResources - END")
   }

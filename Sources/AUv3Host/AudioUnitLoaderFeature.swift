@@ -92,14 +92,15 @@ public struct AudioUnitLoaderFeature {
   }
 
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
+    print("looking for:")
+    print(componentDescription.componentType.stringValue)
+    print(componentDescription.componentSubType.stringValue)
+    print(componentDescription.componentManufacturer.stringValue)
     while true {
       let components = AVAudioUnitComponentManager.shared().components(matching: componentDescription)
+      print("found: \(components.count)")
       if let _ = components.first {
-#if os(macOS)
-        let options: AudioComponentInstantiationOptions = .loadInProcess
-#else
         let options: AudioComponentInstantiationOptions = .loadOutOfProcess
-#endif
         do {
           let audioUnit = try await AVAudioUnit.instantiate(with: componentDescription, options: options)
           if let viewController = await audioUnit.auAudioUnit.requestViewController() {
