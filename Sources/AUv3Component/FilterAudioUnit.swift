@@ -115,6 +115,10 @@ extension FilterAudioUnit {
 
 extension FilterAudioUnit {
 
+  /// Valid combinations of input and output channel counts. Support any number of channels, as long as input and
+  /// output counts match.
+  public override var channelCapabilities: [NSNumber] { [NSNumber(value: -1), NSNumber(value: -1)] }
+
   /// The input busses supported by the component. We only support one.
   override public var inputBusses: AUAudioUnitBusArray { _inputBusses }
 
