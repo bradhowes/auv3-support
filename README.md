@@ -8,16 +8,26 @@
 
 Swift package containing useful code for AUv3 app extensions. There are four products so far in this package:
 
-- [AUv3Shared](Sources/AUv3Shared) -- collection of extensions and classes for both the AudioUnit components that is packaged
+- [AUv3Shared][s] -- collection of extensions and classes for both the AudioUnit components that is packaged
   as an AUv3 app extension and the host app that contains it. Because it will be linked to the AUv3 app
   extension, it must not link to or use any APIs that are forbidden by Apple for use by app extensions.
   This code works on both iOS and macOS platforms.
-- [AUv3Host](Sources/AUv3Host) -- classes that provide a simple AUv3 hosting environment for the AUv3 app extension.
+- [AUv3Host][h] -- classes that provide a simple AUv3 hosting environment for the AUv3 app extension.
   Provides an audio chain that sends a sample loop through the AUv3 audio unit and out to the speaker. Also
   provides for user preset management.
-- [AUv3Component](Sources/AUv3Component) -- classes specific to an AUv3 component.n
+- [AUv3Component][c] -- classes specific to an AUv3 component.n
 
 Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][dh] repo of which this depends on.
+
+# Demo App
+
+There is a demo app that illustrates how to use the [AUv3Host][h] and [AUv3Component][c] modules. The demo app
+essentially replicates what is available in Xcode when you ask it to create a new project from the "Audio Unit Extension
+App" template. The app serves as a simple AUv3 host to play audio samples through the AUv3 effect which is just a simple
+gain control. There is a circular knob that controls the gain of the effect. The knob comes from my [AUv3Controls[ac]
+package, and it is served from the AUv3 component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift).
+
+![](media/AUv3Demo.png)
 
 ## History
 
@@ -27,6 +37,10 @@ framework.
 
 Otherwise, the functionality remains pretty much the same between the two packages.
 
+[s]: Sources/AUv3Shared
+[h]: Sources/AUv3Host
+[c]: Sources/AUv3Component
 [dh]: https://github.com/bradhowes/DSPHeaders
 [old]: https://github.com/bradhowes/AUv3Support
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
+[ac]: https://github.com/bradhowes/AUv3Controls
