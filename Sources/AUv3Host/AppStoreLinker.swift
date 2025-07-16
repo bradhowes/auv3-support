@@ -1,4 +1,6 @@
-import ComposableArchitecture
+// Copyright © 2025 Brad Howes. All rights reserved.
+
+import Dependencies
 import Foundation
 
 #if os(iOS)

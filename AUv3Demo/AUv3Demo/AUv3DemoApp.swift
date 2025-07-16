@@ -21,7 +21,7 @@ struct InteropPlayApp: App {
     sampleLoop: .sample1,
     appStoreVisitor: { _ in },
     maxWait: .seconds(15),
-    alwaysShowNotice: true
+    alwaysShowNotice: false
   )
 
   var body: some Scene {

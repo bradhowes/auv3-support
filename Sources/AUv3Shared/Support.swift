@@ -1,8 +1,5 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
-import AudioUnit
-import os.log
-
 #if os(iOS) || os(visionOS)
 
 import UIKit

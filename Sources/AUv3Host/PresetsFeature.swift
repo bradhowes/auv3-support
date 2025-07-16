@@ -1,3 +1,5 @@
+// Copyright © 2025 Brad Howes. All rights reserved.
+
 import os.log
 import AUv3Component
 @preconcurrency import AVFoundation

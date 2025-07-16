@@ -1,4 +1,6 @@
-import CoreAudioKit
+// Copyright © 2025 Brad Howes. All rights reserved.
+
+import AudioToolbox.AUParameters
 
 /**
  Protocol for AUParameter formatting attributes and AUValue formatters. NOTE: some of these definitions expect a

@@ -1,4 +1,6 @@
-import CoreAudioKit
+// Copyright © 2025 Brad Howes. All rights reserved.
+
+import AudioToolbox.AUAudioUnitImplementation
 
 /**
  Protocol for entities that can respond to get/set requests in the AUParameterTree, such as a DSP kernel.

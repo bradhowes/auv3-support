@@ -1,6 +1,6 @@
-// Copyright © 2022-2024 Brad Howes. All rights reserved.
+// Copyright © 2025 Brad Howes. All rights reserved.
 
-import CoreAudioKit
+import AudioToolbox.AUParameters
 
 /**
  Protocol for an entity that can provide an AUParameterTree and the parameters that are found in it, such as a DSP

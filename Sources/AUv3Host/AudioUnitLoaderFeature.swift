@@ -1,8 +1,14 @@
+// Copyright © 2025 Brad Howes. All rights reserved.
+
 import AUv3Shared
 import AVFoundation
 import ComposableArchitecture
 import SwiftUI
 
+/**
+ Performs the loading of an AUv3 app extension. The only UI associated with this feature is text shown if
+ the loading fails.
+ */
 @Reducer
 public struct AudioUnitLoaderFeature {
 
@@ -98,7 +104,6 @@ public struct AudioUnitLoaderFeature {
     print(componentDescription.componentManufacturer.stringValue)
     while true {
       let components = AVAudioUnitComponentManager.shared().components(matching: componentDescription)
-      print("found: \(components.count)")
       if let _ = components.first {
         let options: AudioComponentInstantiationOptions = .loadOutOfProcess
         do {

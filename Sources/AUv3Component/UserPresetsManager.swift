@@ -1,7 +1,6 @@
-// Copyright © 2022-2024 Brad Howes. All rights reserved.
+// Copyright © 2025 Brad Howes. All rights reserved.
 
-import os.log
-import AudioToolbox
+import AudioToolbox.AUAudioUnit
 import AUv3Shared
 
 /**

@@ -1,6 +1,8 @@
+// Copyright © 2025 Brad Howes. All rights reserved.
+
 import AUv3Shared
 import Combine
-import CoreAudioKit
+import CoreAudioKit.AUViewController
 import os
 import SwiftUI
 
@@ -64,11 +66,9 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
    */
   @discardableResult nonisolated
   public func installAudioUnit(_ audioUnit: FilterAudioUnit) -> FilterAudioUnit {
-    // Better way to do this? We are the only one that can set this, so maybe safe (?)
-    nonisolated(unsafe) let obj = self
     DispatchQueue.main.async {
-      precondition(obj.audioUnit == nil, "unexpectedly re-installing audioUnit property")
-      obj.audioUnit = audioUnit
+      precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
+      self.audioUnit = audioUnit
     }
     return audioUnit
   }

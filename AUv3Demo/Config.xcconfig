@@ -1,3 +1,8 @@
+// Configuration for the AUv3 component.
+//
+// These values are injected into the AUv3 appex Info.plist file and they are also used by
+// the host app when it queries for the AUv3 to load.
+//
 DEVELOPMENT_TEAM = UP6SS5ES7E
 APP_STORE_ID = 1554960150
 AU_BASE_NAME = AUv3DemoAU

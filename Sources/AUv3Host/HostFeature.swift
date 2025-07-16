@@ -1,3 +1,5 @@
+// Copyright © 2025 Brad Howes. All rights reserved.
+
 import AUv3Shared
 import AVFoundation
 import ComposableArchitecture
