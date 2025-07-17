@@ -5,7 +5,7 @@ import ComposableArchitecture
 import SwiftUI
 
 @main
-struct InteropPlayApp: App {
+struct AUv3DemoApp: App {
 
   let config = HostConfig(
     name: Bundle.main.auComponentName,
