@@ -20,6 +20,7 @@ public struct EngineFeature {
   public enum Action {
     case bypassButtonTapped
     case playButtonTapped
+    case connectEffect(AVAudioUnit, SampleLoop)
   }
 
   public var body: some Reducer<State, Action> {
@@ -33,6 +34,9 @@ public struct EngineFeature {
         }
         return .none
 
+      case let .connectEffect(audioUnit, sampleLoop):
+        return connectEffect(&state, audioUnit: audioUnit, sampleLoop: sampleLoop)
+
       case .playButtonTapped:
         state.isPlaying = engine.startStop()
         if !state.isPlaying {
@@ -43,18 +47,20 @@ public struct EngineFeature {
     }
   }
 
-  public func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) {
+  public func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) -> Effect<Action> {
     engine.stop()
     do {
       if try !engine.setSampleLoop(sampleLoop) {
-        return
+        return .none
       }
     } catch {
-      return
+      return .none
     }
 
     engine.connectEffect(audioUnit)
     state.isEnabled = true
+
+    return .none
   }
 }
 

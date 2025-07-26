@@ -93,8 +93,8 @@ public struct HostFeature {
   private func loaderFound(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
     state.audioUnit = payload.audioUnit
     state.auViewController = payload.viewController
-    engine.connectEffect(&state.engine, audioUnit: payload.audioUnit, sampleLoop: state.sampleLoop)
-    return .merge(
+    return .concatenate(
+      engine.connectEffect(&state.engine, audioUnit: payload.audioUnit, sampleLoop: state.sampleLoop).map(Action.engine),
       presets.setSource(&state.presets, source: payload.audioUnit.auAudioUnit).map(Action.presets),
       .run { send in
         await send(.presets(.factoryPresetPicked(0)))

@@ -124,6 +124,7 @@ public struct PresetsFeature {
     case newButtonTapped
     case presetNumberSelected(Int)
     case renameButtonTapped
+    case setSource(AUAudioUnit)
     case updateForCurrentPresetChange(Int?)
     case updateButtonTapped
   }
@@ -139,6 +140,7 @@ public struct PresetsFeature {
       case .newButtonTapped: return newButtonTapped(&state)
       case .presetNumberSelected(let number): return presetNumberSelected(&state, number: number)
       case .renameButtonTapped: return renameTapped(&state)
+      case .setSource(let source): return setSource(&state, source: source)
       case .updateForCurrentPresetChange(let preset): return updateForCurrentPresetChange(&state, preset: preset)
       case .updateButtonTapped: return updateTapped(&state)
       }
