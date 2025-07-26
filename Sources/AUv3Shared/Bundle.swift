@@ -68,18 +68,4 @@ extension Bundle: AppExtensionBundleInfo {
   public var auExtensionUrl: URL? { builtInPlugInsURL?.appendingPathComponent(auExtensionName) }
 
   public func info(for key: String) -> String { infoDictionary?[key] as? String ?? "" }
-
-  public static func audioFileResource(name: String) -> AVAudioFile {
-    let parts = name.split(separator: .init("."))
-    let filename = String(parts[0])
-    let ext = String(parts[1])
-
-    for bundle in Self.allBundles {
-      if let url = bundle.url(forResource: filename, withExtension: ext) {
-        return try! AVAudioFile(forReading: url)
-      }
-    }
-
-    fatalError("\(filename).\(ext) missing from bundle")
-  }
 }

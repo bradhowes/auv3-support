@@ -12,7 +12,11 @@ extension Character {
 
 extension FourCharCode {
 
-  public init(_ value: StringLiteralType) {
+  public init(stringLiteral value: StringLiteralType) {
+    self = FourCharCode.validate(value: value)
+  }
+
+  public init(_ value: String) {
     self = FourCharCode.validate(value: value)
   }
 
@@ -42,3 +46,5 @@ extension FourCharCode {
     }
   }
 }
+
+extension FourCharCode: @retroactive ExpressibleByStringLiteral {}

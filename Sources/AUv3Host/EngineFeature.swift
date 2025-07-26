@@ -45,7 +45,14 @@ public struct EngineFeature {
 
   public func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) {
     engine.stop()
-    engine.setSampleLoop(sampleLoop)
+    do {
+      if try !engine.setSampleLoop(sampleLoop) {
+        return
+      }
+    } catch {
+      return
+    }
+
     engine.connectEffect(audioUnit)
     state.isEnabled = true
   }

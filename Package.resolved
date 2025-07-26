@@ -1,5 +1,5 @@
 {
-  "originHash" : "5aae369389b9292ba3da447a193a48b2d47b6607273318e29e578dc5edf947f4",
+  "originHash" : "f7a30dac5480cf2fd59706c77483b73bddf11c2bc158434f4e21537d923de8f8",
   "pins" : [
     {
       "identity" : "brh-segmented-control",
@@ -16,15 +16,6 @@
       "location" : "https://github.com/pointfreeco/combine-schedulers",
       "state" : {
         "revision" : "5928286acce13def418ec36d05a001a9641086f2",
-        "version" : "1.0.3"
-      }
-    },
-    {
-      "identity" : "dspheaders",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bradhowes/DSPHeaders",
-      "state" : {
-        "revision" : "bdec189b10af060931d35ae9d3b54bc2147f0858",
         "version" : "1.0.3"
       }
     },

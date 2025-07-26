@@ -1,6 +1,7 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
 import AudioToolbox.AUAudioUnit
+import AUv3Component
 import AUv3Shared
 
 /**

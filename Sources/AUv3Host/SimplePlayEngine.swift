@@ -15,9 +15,6 @@ public enum SampleLoop: String {
  */
 public final class SimplePlayEngine: @unchecked Sendable {
 
-  static let bundle = Bundle(for: SimplePlayEngine.self)
-  static let bundleIdentifier = bundle.bundleIdentifier ?? "unknown"
-
   private let engine = AVAudioEngine()
   private let player = AVAudioPlayerNode()
   private let stateChangeQueue = DispatchQueue(
@@ -50,18 +47,25 @@ public final class SimplePlayEngine: @unchecked Sendable {
 
    - parameter sampleLoop: the audio resource to play
    */
-  public func setSampleLoop(_ sampleLoop: SampleLoop) {
-    let file = Bundle.audioFileResource(name: sampleLoop.rawValue)
-    file.framePosition = 0
-    guard let buffer = AVAudioPCMBuffer(
-      pcmFormat: file.processingFormat,
-      frameCapacity: AVAudioFrameCount(file.length)
-    ) else {
-      fatalError("failed to load sample into memory")
+  public func setSampleLoop(_ sampleLoop: SampleLoop) throws -> Bool {
+    if let file = try AVAudioFile.fromBundle(name: sampleLoop.rawValue) {
+      return try setSampleLoopFile(file)
+    } else {
+      return false
     }
+  }
 
+  public func setSampleLoopFile(_ file: AVAudioFile) throws -> Bool {
+    if let buffer = try file.load() {
+      setSampleLoopBuffer(buffer)
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public func setSampleLoopBuffer(_ buffer: AVAudioPCMBuffer) {
     self.buffer = buffer
-    try! file.read(into: buffer)
   }
 
   @discardableResult
@@ -183,5 +187,32 @@ extension SimplePlayEngine {
     player.scheduleBuffer(buffer, at: nil) {
       self.stateChangeQueue.async { self.beginLoop() }
     }
+  }
+}
+
+extension AVAudioFile {
+
+  internal static func fromBundle(name: String) throws -> AVAudioFile? {
+    let parts = name.split(separator: .init("."))
+    let filename = String(parts[0])
+    let ext = String(parts[1])
+    if let url = Bundle.module.url(forResource: filename, withExtension: ext) {
+      return try AVAudioFile(forReading: url)
+    } else {
+      return nil
+    }
+  }
+
+  internal func load() throws -> AVAudioPCMBuffer? {
+    self.framePosition = 0
+    guard let buffer = AVAudioPCMBuffer(
+      pcmFormat: self.processingFormat,
+      frameCapacity: AVAudioFrameCount(self.length)
+    ) else {
+      return nil
+    }
+
+    try self.read(into: buffer)
+    return buffer
   }
 }

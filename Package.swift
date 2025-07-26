@@ -13,7 +13,8 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.0"),
     .package(url: "https://github.com/bradhowes/brh-segmented-control", from: "1.0.5"),
-    .package(url: "https://github.com/bradhowes/DSPHeaders", from: "1.0.2")
+    .package(path: "../DSPHeaders")
+//    .package(url: "https://github.com/bradhowes/DSPHeaders", from: "1.0.2")
   ],
   targets: [
     .target(
@@ -24,6 +25,7 @@ let package = Package(
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(name: "BRHSegmentedControl", package: "brh-segmented-control")
       ],
+      resources: [.process("Resources")],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
         .interoperabilityMode(.Cxx)
@@ -49,6 +51,29 @@ let package = Package(
       name: "AUv3HostTests",
       dependencies: [
         "AUv3Host",
+        "DSPHeaders"
+      ],
+      swiftSettings: [
+        .define("APPLICATION_EXTENSION_API_ONLY"),
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
+    .testTarget(
+      name: "AUv3SharedTests",
+      dependencies: [
+        "AUv3Shared",
+        "DSPHeaders"
+      ],
+      resources: [.process("Resources")],
+      swiftSettings: [
+        .define("APPLICATION_EXTENSION_API_ONLY"),
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
+    .testTarget(
+      name: "AUv3ComponentTests",
+      dependencies: [
+        "AUv3Component",
         "DSPHeaders"
       ],
       swiftSettings: [

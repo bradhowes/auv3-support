@@ -3,9 +3,10 @@
 import AudioToolbox.AUParameters
 
 /**
- Protocol for AUParameter formatting attributes and AUValue formatters. NOTE: some of these definitions expect a
- left-to-right language locale which should be removed and replaced with Apple routines that support this kind of
- thing.
+ Protocol for AUParameter formatting attributes and AUValue formatters.
+
+ NOTE: some of these definitions expect a left-to-right language locale which should be removed and replaced with
+ Apple routines that support this kind of thing.
  */
 public protocol AUParameterFormatting {
   /// The string to insert between the value and the suffix

@@ -4,7 +4,7 @@ import AVFoundation
 import Dependencies
 
 struct SimplePlayEngineClient: @unchecked Sendable {
-  var setSampleLoop: (_ loop: SampleLoop) -> Void
+  var setSampleLoop: (_ loop: SampleLoop) throws -> Bool
   var connectEffect: (_ audioUnit: AVAudioUnit) -> Void
   var isConnected: () -> Bool
   var start: () -> Void
@@ -17,7 +17,7 @@ extension SimplePlayEngineClient {
   static var liveValue: Self {
     let engine = SimplePlayEngine()
     return Self(
-      setSampleLoop: { engine.setSampleLoop($0) },
+      setSampleLoop: { try engine.setSampleLoop($0) },
       connectEffect: { engine.connectEffect(audioUnit: $0, completion: { _ in }) },
       isConnected: { engine.isConnected },
       start: { engine.start() },
@@ -30,7 +30,7 @@ extension SimplePlayEngineClient {
   static var previewValue: Self {
     let engine = SimplePlayEngine()
     return Self(
-      setSampleLoop: { engine.setSampleLoop($0) },
+      setSampleLoop: { try engine.setSampleLoop($0) },
       connectEffect: { engine.connectEffect(audioUnit: $0, completion: { _ in }) },
       isConnected: { engine.isConnected },
       start: { engine.start() },
@@ -42,7 +42,7 @@ extension SimplePlayEngineClient {
 
   static var testValue: Self {
     Self(
-      setSampleLoop: { _ in reportIssue("SimplePlayEngineClient.setSampleLoop is unimplemented") },
+      setSampleLoop: { _ in reportIssue("SimplePlayEngineClient.setSampleLoop is unimplemented"); return false },
       connectEffect: { _ in reportIssue("SimplePlayEngineClient.connectEffect is unimplemented") },
       isConnected: { reportIssue("SimplePlayEngineClient.connectEffect is unimplemented"); return false },
       start: { reportIssue("SimplePlayEngineClient.start is unimplemented") },
