@@ -25,7 +25,7 @@ let package = Package(
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(name: "BRHSegmentedControl", package: "brh-segmented-control")
       ],
-      resources: [.copy("Samples")],
+      resources: [.process("Resources")],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
         .interoperabilityMode(.Cxx)
