@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BDD002C42E364C0900E9AABC /* AUv3Host in Frameworks */ = {isa = PBXBuildFile; productRef = BDD002C32E364C0900E9AABC /* AUv3Host */; };
 		BDF599B62E284D640093A134 /* AUv3DemoExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BDF599B52E284D640093A134 /* AUv3DemoExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BDF599F22E284D8B0093A134 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = BDF599F12E284D8B0093A134 /* Config.xcconfig */; };
 		BDF599F62E284DE60093A134 /* AUv3Component in Frameworks */ = {isa = PBXBuildFile; productRef = BDF599F52E284DE60093A134 /* AUv3Component */; };
-		BDF599F82E284DE60093A134 /* AUv3Hosting in Frameworks */ = {isa = PBXBuildFile; productRef = BDF599F72E284DE60093A134 /* AUv3Hosting */; };
 		BDF599FA2E284DE60093A134 /* AUv3Shared in Frameworks */ = {isa = PBXBuildFile; productRef = BDF599F92E284DE60093A134 /* AUv3Shared */; };
 		BDF59A102E2850430093A134 /* AUv3Component in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A0F2E2850430093A134 /* AUv3Component */; };
 		BDF59A122E2850430093A134 /* AUv3Shared in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A112E2850430093A134 /* AUv3Shared */; };
@@ -116,8 +116,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDF599F82E284DE60093A134 /* AUv3Hosting in Frameworks */,
 				BDF599F62E284DE60093A134 /* AUv3Component in Frameworks */,
+				BDD002C42E364C0900E9AABC /* AUv3Host in Frameworks */,
 				BDF599FA2E284DE60093A134 /* AUv3Shared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,8 +205,8 @@
 			name = AUv3Demo;
 			packageProductDependencies = (
 				BDF599F52E284DE60093A134 /* AUv3Component */,
-				BDF599F72E284DE60093A134 /* AUv3Hosting */,
 				BDF599F92E284DE60093A134 /* AUv3Shared */,
+				BDD002C32E364C0900E9AABC /* AUv3Host */,
 			);
 			productName = AUv3Demo;
 			productReference = BDF599792E284D630093A134 /* AUv3Demo.app */;
@@ -881,15 +881,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BDD002C32E364C0900E9AABC /* AUv3Host */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDF599F32E284DD30093A134 /* XCLocalSwiftPackageReference "../../auv3-support" */;
+			productName = AUv3Host;
+		};
 		BDF599F52E284DE60093A134 /* AUv3Component */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BDF599F32E284DD30093A134 /* XCLocalSwiftPackageReference "../../auv3-support" */;
 			productName = AUv3Component;
-		};
-		BDF599F72E284DE60093A134 /* AUv3Hosting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BDF599F32E284DD30093A134 /* XCLocalSwiftPackageReference "../../auv3-support" */;
-			productName = AUv3Hosting;
 		};
 		BDF599F92E284DE60093A134 /* AUv3Shared */ = {
 			isa = XCSwiftPackageProductDependency;
