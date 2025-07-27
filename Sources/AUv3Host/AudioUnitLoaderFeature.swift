@@ -56,6 +56,9 @@ public struct AudioUnitLoaderFeature {
       }
     }
   }
+}
+
+extension AudioUnitLoaderFeature {
 
   private func finish(
     _ state: inout State,
@@ -98,17 +101,14 @@ public struct AudioUnitLoaderFeature {
   }
 
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
-    print("looking for:")
-    print(componentDescription.componentType.stringValue)
-    print(componentDescription.componentSubType.stringValue)
-    print(componentDescription.componentManufacturer.stringValue)
+    @Dependency(\.avAudioComponentsClient) var avAudioComponentsClient
+
     while true {
-      let components = AVAudioUnitComponentManager.shared().components(matching: componentDescription)
-      if let _ = components.first {
-        let options: AudioComponentInstantiationOptions = .loadOutOfProcess
+      let components = avAudioComponentsClient.query(componentDescription)
+      if !components.isEmpty {
         do {
-          let audioUnit = try await AVAudioUnit.instantiate(with: componentDescription, options: options)
-          if let viewController = await audioUnit.auAudioUnit.requestViewController() {
+          let audioUnit = try await avAudioComponentsClient.instantiate(componentDescription)
+          if let viewController = await avAudioComponentsClient.requestViewController(audioUnit) {
             await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           } else {
             await send(.audioUnitCreationFailed(.nilViewController))
@@ -138,6 +138,7 @@ public struct AudioUnitLoaderView: View {
         Spacer()
         Text(store.status)
           .font(.largeTitle)
+          .foregroundStyle(.white)
         Spacer()
       }
       Spacer()
@@ -147,8 +148,8 @@ public struct AudioUnitLoaderView: View {
   }
 }
 
-struct AudioUnitLoaderViewPreview: PreviewProvider {
-  static let acd = AudioComponentDescription(
+#Preview {
+  let acd = AudioComponentDescription(
     componentType: FourCharCode("aufx"),
     componentSubType: FourCharCode("dely"),
     componentManufacturer: FourCharCode("appl"),
@@ -156,14 +157,12 @@ struct AudioUnitLoaderViewPreview: PreviewProvider {
     componentFlagsMask: 0
   )
 
-  static var store = Store(initialState: AudioUnitLoaderFeature.State(componentDescription: acd)) {
+  let store = Store(initialState: AudioUnitLoaderFeature.State(componentDescription: acd)) {
     AudioUnitLoaderFeature()
-      ._printChanges()
   }
 
-  static var previews: some View {
-    VStack {
-      AudioUnitLoaderView(store: store)
-    }
-  }
+  return ZStack {
+    Color.black
+    AudioUnitLoaderView(store: store)
+  }.environment(\.colorScheme, .dark)
 }

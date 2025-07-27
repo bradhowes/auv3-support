@@ -216,5 +216,5 @@ public struct HostView: View {
     .accentColor(config.themeLabelColor)
     .environment(\.themeControlColor, config.themeControlColor)
     .environment(\.themeLabelColor, config.themeLabelColor)
+    .environment(\.colorScheme, .dark)
 }
-

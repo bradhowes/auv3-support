@@ -40,7 +40,6 @@ let package = Package(
       name: "AUv3Component",
       dependencies: [
         "AUv3Shared",
-        "DSPHeaders",
         .product(name: "DSPHeaders", package: "DSPHeaders")
       ],
       swiftSettings: [

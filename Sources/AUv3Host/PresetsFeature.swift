@@ -45,9 +45,9 @@ public struct PresetsFeature {
     // The current prompt being shown to the user.
     var activePrompt: PromptState
     // Factory presets are constant and do not change
-    var factoryPresets: [AUAudioUnitPreset] { source?.factoryPresets ?? [] }
+    var factoryPresets: [AUAudioUnitPreset]
     // User presets can be changed
-    var userPresets: [AUAudioUnitPreset] { source?.userPresets ?? [] }
+    var userPresets: [AUAudioUnitPreset]
     // The current preset can be changed. However, we do so as a side effect of changing the preset number below
     var currentPreset: AUAudioUnitPreset? { source?.currentPreset }
     // The current preset number. When it is changed we update the `currentPreset` value. To be able to bind with
@@ -95,8 +95,13 @@ public struct PresetsFeature {
       self.currentPresetNumber = self.unsetPresetNumber
       self.currentPresetName = self.unsetPresetName
       if let source {
+        self.factoryPresets = source.factoryPresetsNonNil
+        self.userPresets = source.userPresets
         self.currentPresetNumber = source.currentPreset?.number ?? self.unsetPresetNumber
         self.currentPresetName = source.currentPreset?.name ?? self.unsetPresetName
+      } else {
+        self.factoryPresets = []
+        self.userPresets = []
       }
     }
 
@@ -152,6 +157,8 @@ public struct PresetsFeature {
 
   public func setSource(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
     state.source = source
+    state.factoryPresets = source.factoryPresetsNonNil
+    state.userPresets = source.userPresets
     return .run { send in
       await Self.monitorCurrentPreset(source: source, send: send)
     }.cancellable(id: CancelId.monitorCurrentPreset)
@@ -194,6 +201,7 @@ public struct PresetsFeature {
        let preset = state.currentPreset,
        preset.number < 0 {
       try? source.deleteUserPreset(.init(number: preset.number, name: preset.name))
+      state.userPresets.removeAll { $0.number == preset.number }
       state.currentPresetNumber = state.unsetPresetNumber
     }
     return .none
@@ -213,6 +221,7 @@ public struct PresetsFeature {
     if let source = state.source {
       let preset = AUAudioUnitPreset(number: state.nextUserPresetNumber, name: state.activePrompt.name)
       try? source.saveUserPreset(preset)
+      state.userPresets.append(preset)
       state.currentPresetNumber = preset.number
       clearPrompt(&state)
     }
@@ -225,6 +234,8 @@ public struct PresetsFeature {
       let new = AUAudioUnitPreset(number: preset.number, name: state.activePrompt.name)
       try? source.deleteUserPreset(preset)
       try? source.saveUserPreset(new)
+      state.userPresets.removeAll { $0.number == preset.number }
+      state.userPresets.append(new)
       state.currentPresetNumber = new.number
     }
     clearPrompt(&state)

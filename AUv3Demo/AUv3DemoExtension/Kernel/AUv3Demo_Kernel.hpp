@@ -1,20 +1,12 @@
 #pragma once
 
 #import <AudioToolbox/AudioToolbox.h>
-#import <algorithm>
-#import <functional>
 #import <string>
 #import <swift/bridging>
-#import <vector>
 
-#import <DSPHeaders/BusBuffers.hpp>
-#import <DSPHeaders/DelayBuffer.hpp>
 #import <DSPHeaders/EventProcessor.hpp>
 #import <DSPHeaders/IntrusiveReferenceCounted.hpp>
-#import <DSPHeaders/LFO.hpp>
-#import <DSPHeaders/Parameters/Bool.hpp>
-#import <DSPHeaders/Parameters/Milliseconds.hpp>
-#import <DSPHeaders/Parameters/Percentage.hpp>
+#import "DSPHeaders/Parameters/Float.hpp"
 #import <DSPHeaders/TypeErasedKernel.hpp>
 
 #import "AUv3Demo_ParameterAddress.h"
@@ -103,14 +95,7 @@ public:
    */
   inline DSPHeaders::TypeErasedKernel bridge() {
     using namespace std::placeholders;
-    return DSPHeaders::TypeErasedKernel(std::bind(&AUv3Demo_Kernel::processAndRender,
-                                                  this,
-                                                  _1,
-                                                  _2,
-                                                  _3,
-                                                  _4,
-                                                  _5,
-                                                  _6));
+    return DSPHeaders::TypeErasedKernel(std::bind(&AUv3Demo_Kernel::processAndRender, this, _1, _2, _3, _4, _5, _6));
   }
 
   /**
