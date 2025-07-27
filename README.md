@@ -1,8 +1,8 @@
-[![CI](https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml/badge.svg)](https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml)
-[![COV](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/bradhowes/8a47cae880f266d624470c768706af2c/raw/auv3-support-coverage.json)](https://github.com/bradhowes/auv3-support/blob/main/.github/workflows/CI.yml)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbradhowes%2Fauv3-support%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/bradhowes/auv3-support)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbradhowes%2Fauv3-support%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/bradhowes/auv3-support)
-[![License: MIT](https://img.shields.io/badge/License-MIT-A31F34.svg)](https://opensource.org/licenses/MIT)
+[![CI][status]][ci]
+[![COV][cov]][ci]
+[![][spiv]][spi]
+[![][spip]][spi]
+[![License: MIT][mit]][license]
 
 # Overview
 
@@ -58,3 +58,12 @@ Otherwise, the functionality remains pretty much the same between the two packag
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [ac]: https://github.com/bradhowes/AUv3Controls
 [sc]: https://github.com/bradhowes/brh-segmented-control
+
+[ci]: https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml
+[status]: https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml/badge.svg
+[cov]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/bradhowes/8a47cae880f266d624470c768706af2c/raw/auv3-support-coverage.json
+[spi]: https://swiftpackageindex.com/bradhowes/auv3-support
+[spiv]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbradhowes%2Fauv3-support%2Fbadge%3Ftype%3Dswift-versions
+[spip]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbradhowes%2Fauv3-support%2Fbadge%3Ftype%3Dplatforms
+[mit]: https://img.shields.io/badge/License-MIT-A31F34.svg
+[license]: https://opensource.org/licenses/MIT
