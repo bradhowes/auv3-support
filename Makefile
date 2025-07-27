@@ -20,7 +20,7 @@ coverage-iOS: test-iOS
 	cat coverage_iOS.txt
 
 percentage-iOS: coverage-iOS
-	awk '/ AUv3-Support / { print $$4 }' coverage_iOS.txt > percentage_iOS.txt
+	awk '/ AUv3Shared / { print $$4 }' coverage_iOS.txt > percentage_iOS.txt
 	echo "iOS Coverage Pct:"
 	cat percentage_iOS.txt
 
@@ -38,7 +38,7 @@ coverage-macOS: test-macOS
 	cat coverage_macOS.txt
 
 percentage-macOS: coverage-macOS
-	awk '/ AUv3-Support / { print $$4 }' coverage_macOS.txt > percentage_macOS.txt
+	awk '/ AUv3Shared / { print $$4 }' coverage_macOS.txt > percentage_macOS.txt
 	echo "macOS Coverage Pct:"
 	cat percentage_macOS.txt
 
