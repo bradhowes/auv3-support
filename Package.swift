@@ -20,21 +20,19 @@ let package = Package(
     .target(
       name: "AUv3Host",
       dependencies: [
-        "AUv3Shared",
         "AUv3Component",
+        "AUv3Shared",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(name: "BRHSegmentedControl", package: "brh-segmented-control")
       ],
-      resources: [.process("Resources")],
+      resources: [.copy("Samples")],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
         .interoperabilityMode(.Cxx)
       ]
     ),
     .target(
-      name: "AUv3Shared",
-      dependencies: [
-      ]
+      name: "AUv3Shared"
     ),
     .target(
       name: "AUv3Component",
