@@ -26,8 +26,7 @@ public struct PresetsFeature {
   }
 
   // Vanilla SwiftUI state for an alert to get a preset name
-  @Observable
-  class PromptState: Equatable {
+  struct PromptState: Equatable {
     // What to perform when the prompt is accepted
     let prompt: PromptAction
     // The value to use from the prompt
@@ -37,16 +36,12 @@ public struct PresetsFeature {
       self.prompt = prompt
       self.name = name
     }
-
-    static func == (lhs: PresetsFeature.PromptState, rhs: PresetsFeature.PromptState) -> Bool {
-      lhs.prompt == rhs.prompt && lhs.name == rhs.name
-    }
   }
 
   @ObservableState
   public struct State: Equatable {
     // The source of the presets to display and work with
-    var source: AUAudioUnitPresetsFacade?
+    var source: AUAudioUnit?
     // The current prompt being shown to the user.
     var activePrompt: PromptState
     // Factory presets are constant and do not change
@@ -60,11 +55,11 @@ public struct PresetsFeature {
     var currentPresetNumber: Int {
       didSet {
         source?.currentPreset = find(number: currentPresetNumber)
-        currentPresetName = source?.currentPreset?.name ?? "(None)"
+        currentPresetName = source?.currentPreset?.name ?? unsetPresetName
       }
     }
     // Read-only non-nil preset name
-    var currentPresetName: String = "(None)"
+    var currentPresetName: String
     // True if audio unit provides one or more factory presets
     var hasFactoryPresets: Bool { !factoryPresets.isEmpty }
     // True if audio unit supports user presets
@@ -77,31 +72,31 @@ public struct PresetsFeature {
     var factoryPresetsOrderedByName: [AUAudioUnitPreset] { factoryPresets.sorted() }
     // A preset number that will never be used
     let unsetPresetNumber: Int = 100_000
+    let unsetPresetName = "(None)"
     // Obtain the smallest negative unused number to use for a new preset. User presets are always negative.
     // Deleting presets can cause holes in the negative numbers.
-    var nextNumber: Int {
+    var nextUserPresetNumber: Int {
+      guard !userPresets.isEmpty else { return -1 }
       let ordered = userPresets.sorted { $0.number > $1.number}
-      var number = max(ordered.first?.number ?? -1, -1)
-      for entry in ordered {
-        if entry.number != number {
-          break
-        }
+      var number = max(ordered[0].number, -1)
+      for entry in ordered where entry.number == number {
         number -= 1
       }
       return number
     }
-    // Locate the preset with the given number or nil if none was found
+    // Locate the preset with the given number or nil if no match was found
     func find(number: Int) -> AUAudioUnitPreset? {
       (number >= 0 ? factoryPresets : userPresets).first { $0.number == number }
     }
 
-    public init(source: AUAudioUnitPresetsFacade?) {
+    public init(source: AUAudioUnit?) {
       self.source = source
       self.activePrompt = .init(prompt: .none, name: "")
       self.currentPresetNumber = self.unsetPresetNumber
+      self.currentPresetName = self.unsetPresetName
       if let source {
-        self.currentPresetNumber = self.unsetPresetNumber
-        self.currentPresetName = source.currentPreset?.name ?? "(None)"
+        self.currentPresetNumber = source.currentPreset?.number ?? self.unsetPresetNumber
+        self.currentPresetName = source.currentPreset?.name ?? self.unsetPresetName
       }
     }
 
@@ -117,14 +112,16 @@ public struct PresetsFeature {
   @CasePathable
   public enum Action {
     case deleteButtonTapped
-    case promptCancelButtonTapped
     case doNew
     case doRename
     case factoryPresetPicked(Int)
     case newButtonTapped
     case presetNumberSelected(Int)
+    case promptCancelButtonTapped
+    case promptTextChanged(String)
     case renameButtonTapped
     case setSource(AUAudioUnit)
+    case stopMonitoringCurrentPresetChange
     case updateForCurrentPresetChange(Int?)
     case updateButtonTapped
   }
@@ -139,22 +136,28 @@ public struct PresetsFeature {
       case .factoryPresetPicked(let index): return factoryPresetPicked(&state, index: index)
       case .newButtonTapped: return newButtonTapped(&state)
       case .presetNumberSelected(let number): return presetNumberSelected(&state, number: number)
+      case .promptTextChanged(let value): return promptTextChanged(&state, value: value)
       case .renameButtonTapped: return renameTapped(&state)
       case .setSource(let source): return setSource(&state, source: source)
+      case .stopMonitoringCurrentPresetChange: return .cancel(id: CancelId.monitorCurrentPreset)
       case .updateForCurrentPresetChange(let preset): return updateForCurrentPresetChange(&state, preset: preset)
       case .updateButtonTapped: return updateTapped(&state)
       }
     }
   }
 
+  enum CancelId {
+    case monitorCurrentPreset
+  }
+
   public func setSource(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
     state.source = source
     return .run { send in
-      await Self.monitorCurrenPreset(source: source, send: send)
-    }
+      await Self.monitorCurrentPreset(source: source, send: send)
+    }.cancellable(id: CancelId.monitorCurrentPreset)
   }
 
-  private static func monitorCurrenPreset(source: AUAudioUnit, send: Send<Action>) async {
+  private static func monitorCurrentPreset(source: AUAudioUnit, send: Send<Action>) async {
     let log = OSLog(subsystem: "AUV3Controls.KnobFeature", category: "PresetsFeature")
     os_log(.info, log: log, "run: setSource")
     var lastValue: Int?
@@ -172,7 +175,8 @@ public struct PresetsFeature {
 
   private func updateForCurrentPresetChange(_ state: inout State, preset: Int?) -> Effect<Action> {
     // When the audio unit current preset is cleared, do the same with our view of it.
-    preset == nil ? clearCurrentPreset(&state) : .none
+    print("updateForCurrentPresetChange:", preset)
+    return preset == nil ? clearCurrentPreset(&state) : .none
   }
 
   private func clearPrompt(_ state: inout State) {
@@ -181,6 +185,7 @@ public struct PresetsFeature {
 
   private func clearCurrentPreset(_ state: inout State) -> Effect<Action> {
     state.currentPresetNumber = state.unsetPresetNumber
+    state.currentPresetName = state.unsetPresetName
     return .none.animation()
   }
 
@@ -199,9 +204,14 @@ public struct PresetsFeature {
     return .none.animation()
   }
 
+  private func promptTextChanged(_ state: inout State, value: String) -> Effect<Action> {
+    state.activePrompt.name = value
+    return .none
+  }
+
   private func doNew(_ state: inout State) -> Effect<Action> {
     if let source = state.source {
-      let preset = AUAudioUnitPreset(number: state.nextNumber, name: state.activePrompt.name)
+      let preset = AUAudioUnitPreset(number: state.nextUserPresetNumber, name: state.activePrompt.name)
       try? source.saveUserPreset(preset)
       state.currentPresetNumber = preset.number
       clearPrompt(&state)
@@ -256,9 +266,10 @@ public struct PresetsFeature {
   public init() {}
 }
 
+private let checkmark = Image(systemName: "checkmark")
+private let clearmark = Image.filledRect(size: .init(width: 20, height: 20))
+
 public struct PresetsMenu: View {
-  static let checkmark = Image(systemName: "checkmark")
-  static let clearmark = Image.filledRect(size: .init(width: 20, height: 20))
 
   @Bindable private var store: StoreOf<PresetsFeature>
   @Environment(\.themeControlColor) private var themeControlColor: Color
@@ -294,11 +305,15 @@ public struct PresetsMenu: View {
     ) {
       TextField("Text Input", text: Binding(
         get: { store.activePrompt.name },
-        set: { store.activePrompt.name = $0 }
+        set: { store.send(.promptTextChanged($0)) }
       ))
-      Button("Cancel", role: .cancel) { store.send(.promptCancelButtonTapped) }
-      Button("OK") { store.send(store.activePrompt.prompt == .askForNewName ? .doNew : .doRename) }
-        .disabled(store.activePrompt.name.isEmpty)
+      Button("Cancel", role: .cancel) {
+        store.send(.promptCancelButtonTapped)
+      }
+      Button("OK") {
+        store.send(store.activePrompt.prompt == .askForNewName ? .doNew : .doRename)
+      }
+      .disabled(store.activePrompt.name.isEmpty)
     }
 #endif
 #if os(macOS)
@@ -356,7 +371,7 @@ public struct PresetsMenu: View {
     Label {
       Text(preset.name)
     } icon: {
-      store.currentPresetNumber == preset.number ? Self.checkmark : Self.clearmark
+      store.currentPresetNumber == preset.number ? checkmark : clearmark
     }
     .tint(preset.number == store.currentPresetNumber ? themeLabelColor : nil)
     .tag(preset.number)
@@ -406,16 +421,9 @@ extension AUAudioUnitPreset: @retroactive Comparable {
   }
 }
 
-fileprivate class FakeSource: NSObject, AUAudioUnitPresetsFacade {
+fileprivate class FakeSource: AUAudioUnit, @unchecked Sendable {
 
-  func clearCurrentPresetIfFactoryPreset() {
-    if let preset = currentPreset, preset.number >= 0 {
-      currentPreset = nil
-    }
-  }
-
-  // let factoryPresets: [AUAudioUnitPreset]? = nil
-  let factoryPresets: [AUAudioUnitPreset]? = [
+  private let _factoryPresets: [AUAudioUnitPreset] = [
     .init(number: 0, name: "Foo"),
     .init(number: 1, name: "Bar"),
     .init(number: 2, name: "Ping"),
@@ -423,34 +431,50 @@ fileprivate class FakeSource: NSObject, AUAudioUnitPresetsFacade {
     .init(number: 4, name: "Bat")
   ]
 
-  var supportsUserPresets: Bool { true }
+  func clearCurrentPresetIfFactoryPreset() {
+    if let preset = currentPreset, preset.number >= 0 {
+      currentPreset = nil
+    }
+  }
 
-  var userPresets: [AUAudioUnitPreset] = [
+  override var factoryPresets: [AUAudioUnitPreset]? { _factoryPresets }
+  override var supportsUserPresets: Bool { true }
+
+  private var _userPresets: [AUAudioUnitPreset] = [
     .init(number: -1, name: "My User"),
     .init(number: -2, name: "Another Name"),
     .init(number: -3, name: "Yet Another Very Long Name")
   ]
+  override var userPresets: [AUAudioUnitPreset] { _userPresets }
 
-  var currentPreset: AUAudioUnitPreset? = nil
-
-  func saveUserPreset(_ preset: AUAudioUnitPreset) throws {
-    for (index, each) in userPresets.enumerated() {
-      if each.number == preset.number {
-        userPresets[index] = preset
-        return
-      }
-    }
-    userPresets.append(preset)
+  override func saveUserPreset(_ preset: AUAudioUnitPreset) throws {
+    _userPresets.removeAll { $0.number == preset.number }
+    _userPresets.append(preset)
   }
 
-  func deleteUserPreset(_ preset: AUAudioUnitPreset) throws {
-    userPresets.removeAll { $0.number == preset.number }
+  override func deleteUserPreset(_ preset: AUAudioUnitPreset) throws {
+    _userPresets.removeAll { $0.number == preset.number }
+  }
+
+  init() {
+    do {
+      try super.init(
+        componentDescription: .init(
+          componentType: "aufx",
+          componentSubType: "dely",
+          componentManufacturer: "appl"
+        ),
+        options: []
+      )
+    } catch {
+      fatalError("failed to instantiate FakeSource audio unit: \(error)")
+    }
   }
 }
 
 struct PresetsViewPreview: PreviewProvider {
   fileprivate static let source = FakeSource()
-  static var store = Store(initialState: PresetsFeature.State(source: source)) {
+  fileprivate static var store = Store(initialState: PresetsFeature.State(source: source)) {
     PresetsFeature()
       ._printChanges()
   }

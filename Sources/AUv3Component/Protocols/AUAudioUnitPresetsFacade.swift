@@ -6,7 +6,7 @@ import AUv3Shared
 /**
  Subset of AUAudioUnit functionality that is used by UserPresetsManager.
  */
-public protocol AUAudioUnitPresetsFacade: NSObject {
+public protocol AUAudioUnitPresetsFacade: NSObject, Sendable {
 
   /// Obtain an array of factory presets that is never nil.
   var factoryPresets: [AUAudioUnitPreset]? { get }
@@ -51,5 +51,6 @@ extension AUAudioUnitPresetsFacade {
   }
 }
 
+extension AUAudioUnit: @retroactive @unchecked Sendable {}
 extension AUAudioUnit: AUAudioUnitPresetsFacade {}
 

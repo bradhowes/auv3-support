@@ -5,7 +5,7 @@ import Testing
 @testable import AUv3Host
 
 @MainActor
-struct EngineTests {
+struct EngineFeatureTests {
 
   @Test func startStopBypass() async {
     var engineRunning = false

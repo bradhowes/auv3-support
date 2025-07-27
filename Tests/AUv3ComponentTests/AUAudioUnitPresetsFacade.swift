@@ -1,23 +1,9 @@
 import AUv3Shared
-import AudioToolbox.AUParameters
+@preconcurrency import AudioToolbox.AUParameters
 import Testing
 @testable import AUv3Component
 
-private enum MockParameterAddress: AUParameterAddress, CaseIterable, ParameterAddressProvider {
-  case p1 = 123
-  case p2 = 124
-  case p3 = 125
-
-  var parameterAddress: AUParameterAddress { self.rawValue }
-}
-
-private struct MockPreset {
-  let p1: AUValue
-  let p2: AUValue
-  let p3: AUValue
-}
-
-private class MockFascade: NSObject, AUAudioUnitPresetsFacade {
+private final class MockFascade: NSObject, @unchecked Sendable, AUAudioUnitPresetsFacade {
   let factoryPresets: [AUAudioUnitPreset]?
   var userPresets: [AUAudioUnitPreset]
   var currentPreset: AUAudioUnitPreset?

@@ -5,7 +5,7 @@ import Testing
 
 @testable import AUv3Host
 
-private class MockAudioUnit: NSObject, AUAudioUnitPresetsFacade {
+private final class MockAudioUnit: NSObject, @unchecked Sendable, AUAudioUnitPresetsFacade {
   var factoryPresets: [AUAudioUnitPreset]? = [.init(number: 0, name: "Zero"),
                                               .init(number: 1, name: "One")
   ]
