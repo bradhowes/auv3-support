@@ -1,5 +1,5 @@
 {
-  "originHash" : "69be1af4ad05a5844a54bab6be18d670f10af6d3a8d6c43c5a78e15e3aa94e28",
+  "originHash" : "8784e313c05a2151ebdc379b68c7bd4171110937c42561deef20dbd9fc103060",
   "pins" : [
     {
       "identity" : "brh-segmented-control",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "5928286acce13def418ec36d05a001a9641086f2",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "dspheaders",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bradhowes/DSPHeaders",
+      "state" : {
+        "revision" : "b5840aaf73075be77bf506db3fcae4fc7e276021",
+        "version" : "1.0.5"
       }
     },
     {

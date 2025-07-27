@@ -14,8 +14,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.0"),
     .package(url: "https://github.com/bradhowes/brh-segmented-control", from: "1.0.5"),
     .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
-    .package(path: "../DSPHeaders")
-//    .package(url: "https://github.com/bradhowes/DSPHeaders", from: "1.0.2")
+    .package(url: "https://github.com/bradhowes/DSPHeaders", from: "1.0.5")
   ],
   targets: [
     .target(
@@ -41,7 +40,8 @@ let package = Package(
       name: "AUv3Component",
       dependencies: [
         "AUv3Shared",
-        "DSPHeaders"
+        "DSPHeaders",
+        .product(name: "DSPHeaders", package: "DSPHeaders")
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
@@ -52,7 +52,7 @@ let package = Package(
       name: "AUv3HostTests",
       dependencies: [
         "AUv3Host",
-        "DSPHeaders"
+        .product(name: "DSPHeaders", package: "DSPHeaders")
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
@@ -63,7 +63,7 @@ let package = Package(
       name: "AUv3SharedTests",
       dependencies: [
         "AUv3Shared",
-        "DSPHeaders"
+        .product(name: "DSPHeaders", package: "DSPHeaders")
       ],
       resources: [.process("Resources")],
       swiftSettings: [
@@ -75,8 +75,8 @@ let package = Package(
       name: "AUv3ComponentTests",
       dependencies: [
         "AUv3Component",
-        "DSPHeaders",
-        .product(name: "Numerics", package: "swift-numerics"),
+        .product(name: "DSPHeaders", package: "DSPHeaders"),
+        .product(name: "Numerics", package: "swift-numerics")
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
