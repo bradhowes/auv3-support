@@ -6,7 +6,7 @@ let package = Package(
   name: "auv3-support",
   platforms: [.iOS(.v18), .macOS(.v15)],
   products: [
-    .library(name: "AUv3Hosting", targets: ["AUv3Host"]),
+    .library(name: "AUv3Host", targets: ["AUv3Host"]),
     .library(name: "AUv3Shared", targets: ["AUv3Shared"]),
     .library(name: "AUv3Component", targets: ["AUv3Component"]),
   ],

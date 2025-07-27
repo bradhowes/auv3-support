@@ -201,9 +201,9 @@ public struct HostView: View {
     version: "1.2.3",
     appStoreId: "1554960150",
     componentDescription: .init(
-      componentType: Bundle.main.auComponentType,
-      componentSubType: Bundle.main.auComponentSubtype,
-      componentManufacturer: Bundle.main.auComponentManufacturer,
+      componentType: "aufx",
+      componentSubType: "dely",
+      componentManufacturer: "appl",
       componentFlags: 0,
       componentFlagsMask: 0
     ),

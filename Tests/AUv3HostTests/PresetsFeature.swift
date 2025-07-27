@@ -348,4 +348,18 @@ fileprivate class PresetsFeatureTests {
 
     await sut.send(.stopMonitoringCurrentPresetChange)
   }
+
+  @Test func updateButtonTapped() async {
+    let sut = MockState.defaultPresets.store
+
+    await sut.send(.presetNumberSelected(-1)) {
+      $0.currentPresetNumber = -1
+      $0.currentPresetName = "User"
+    }
+
+    let oldPreset = sut.state.source?.userPresets[0]
+    await sut.send(.updateButtonTapped)
+    let newPreset = sut.state.source?.userPresets[0]
+    #expect(oldPreset !== newPreset)
+  }
 }

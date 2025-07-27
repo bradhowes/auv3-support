@@ -175,7 +175,7 @@ public struct PresetsFeature {
 
   private func updateForCurrentPresetChange(_ state: inout State, preset: Int?) -> Effect<Action> {
     // When the audio unit current preset is cleared, do the same with our view of it.
-    print("updateForCurrentPresetChange:", preset)
+    print("updateForCurrentPresetChange: \(String(describing: preset))")
     return preset == nil ? clearCurrentPreset(&state) : .none
   }
 
