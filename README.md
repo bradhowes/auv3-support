@@ -6,18 +6,21 @@
 
 # Overview
 
-Swift package containing useful code for AUv3 app extensions. There are four products so far in this package:
+Swift package containing useful code for AUv3 app extensions. There are three products in this package:
 
-- [AUv3Shared][s] -- collection of extensions and classes for both the AudioUnit components that is packaged
-  as an AUv3 app extension and the host app that contains it. Because it will be linked to the AUv3 app
-  extension, it must not link to or use any APIs that are forbidden by Apple for use by app extensions.
-  This code works on both iOS and macOS platforms.
-- [AUv3Host][h] -- classes that provide a simple AUv3 hosting environment for the AUv3 app extension.
-  Provides an audio chain that sends a sample loop through the AUv3 audio unit and out to the speaker. Also
-  provides for user preset management.
-- [AUv3Component][c] -- classes specific to an AUv3 component.n
+- [AUv3Shared][s] -- collection of extensions and classes for both AudioUnit components packaged as an AUv3 app
+  extension, and the host app that contains them. Because it will be linked to the AUv3 app extension, it must not link
+  to or use any APIs that are forbidden by Apple for use by app extensions. This code works on both iOS and macOS
+  platforms.
+- [AUv3Host][h] -- classes that provide a simple AUv3 hosting environment for the AUv3 app extension. Provides an audio
+  chain that sends a sample loop through the AUv3 audio unit and out to the main speaker. The host supports user presets.
+- [AUv3Component][c] -- classes specific to an AUv3 component. Foremost is the [FilterAudioUnit][fau] class that
+  provides a generic AUv3 container for a custom DSP kernel that performs the signal processing. Additional Swift types
+  provide useful parameter functionality.
 
-Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][dh] repo of which this depends on.
+Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][dh] repo. Of particular note is the 
+[EventProcessor][ep] template class that provides a complete foundation for a C++ DSP kernel that can be used in Swift and
+put in [FilterAudioUnit][fau] container.
 
 # Demo App
 
@@ -58,6 +61,8 @@ Otherwise, the functionality remains pretty much the same between the two packag
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [ac]: https://github.com/bradhowes/AUv3Controls
 [sc]: https://github.com/bradhowes/brh-segmented-control
+[fau]: Sources/AUv3Component/FilterAudioUnit.swift
+[ep]: https://github.com/bradhowes/DSPHeaders/Sources/DSPHeaders/include/DSPHeaders/EventProcessor.hpp
 
 [ci]: https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml
 [status]: https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml/badge.svg
