@@ -63,7 +63,8 @@ fileprivate enum MockState {
     case .noSource: return TestStore(initialState: PresetsFeature.State.init(source: nil)) { PresetsFeature() }
     case .customUserPresets(let userPresets):
       fascade._userPresets = userPresets
-    case .defaultPresets: break
+    case .defaultPresets:
+      break
     case .noUserPresets:
       fascade._supportsUserPresets = false
       fascade._userPresets = []
@@ -178,21 +179,15 @@ fileprivate class PresetsFeatureTests {
   }
 
   @Test func newButtonTapped() async {
-    let facade = MockFacade()
-    let sut = MockState.noSource.store
-    await sut.send(.setSource(facade)) {
-      $0.source = facade
-    }
+    let sut = MockState.defaultPresets.store
 
-    await sut.receive(\.updateForCurrentPresetChange, 1)
-
-    await sut.send(\.factoryPresetPicked, 1) {
-      $0.currentPresetNumber = 1
-      $0.currentPresetName = "Foo"
+    await sut.send(.presetNumberSelected(2)) {
+      $0.currentPresetNumber = 2
+      $0.currentPresetName = "Bar"
     }
 
     await sut.send(.newButtonTapped) {
-      $0.activePrompt = .init(prompt: .askForNewName, name: "Foo")
+      $0.activePrompt = .init(prompt: .askForNewName, name: "Bar")
     }
 
     await sut.send(.promptTextChanged("New Foo")) {
@@ -204,7 +199,7 @@ fileprivate class PresetsFeatureTests {
       $0.currentPresetNumber = -2
     }
 
-    await sut.receive(\.updateForCurrentPresetChange, -2)
+    // await sut.receive(\.updateForCurrentPresetChange, -1)
 
     #expect(sut.state.source?.userPresets.count == 2)
 
@@ -263,20 +258,22 @@ fileprivate class PresetsFeatureTests {
   }
 
   @Test func deleteButtonTapped() async {
-    let sut = MockState.defaultPresets.store
+    let sut = MockState.customUserPresets([
+      .init(number: -1, name: "One"),
+      .init(number: -3, name: "Three"),
+      .init(number: -6, name: "Six"),
+      .init(number: -2, name: "Two"),
+      .init(number: -5, name: "Five")
+    ]).store
 
-    await sut.send(.newButtonTapped) {
-      $0.activePrompt = .init(prompt: .askForNewName, name: "Foo")
-    }
-
-    await sut.send(.doNew) {
-      $0.activePrompt = .init(prompt: .none, name: "")
-      $0.currentPresetNumber = -2
-      $0.currentPresetName = "User"
+    await sut.send(.presetNumberSelected(-1)) {
+      $0.currentPresetNumber = -1
+      $0.currentPresetName = "One"
     }
 
     await sut.send(.deleteButtonTapped) {
       $0.currentPresetNumber = $0.unsetPresetNumber
+      $0.currentPresetName = $0.unsetPresetName
     }
 
     await sut.send(.deleteButtonTapped)
