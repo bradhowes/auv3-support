@@ -7,7 +7,7 @@ import Foundation
 
 import UIKit
 
-public struct AppStoreLinker:@unchecked Sendable {
+public struct AppStoreLinker: @unchecked Sendable {
   public var visit: (String) async -> Void
 }
 
