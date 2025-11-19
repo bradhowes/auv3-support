@@ -9,7 +9,7 @@ struct AUv3DemoApp: App {
 
   let config = HostConfig(
     name: Bundle.main.auComponentName,
-    version: "1.2.3",
+    version: "1.0.0",
     appStoreId: Bundle.main.appStoreId,
     componentDescription: .init(
       componentType: Bundle.main.auComponentType,
