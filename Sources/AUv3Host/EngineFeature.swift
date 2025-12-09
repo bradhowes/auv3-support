@@ -51,7 +51,7 @@ public struct EngineFeature {
     }
   }
 
-  public func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) -> Effect<Action> {
+  private func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) -> Effect<Action> {
     engine.stop()
     do {
       if try !engine.setSampleLoop(sampleLoop) {
