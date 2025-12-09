@@ -1,5 +1,6 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
+import AUv3Shared
 import AVFoundation
 
 /**
@@ -39,7 +40,9 @@ public final class SimplePlayEngine: @unchecked Sendable {
    Create new audio processing setup, with an audio file player for a signal source.
    */
   public init() {
+    log.info("init BEGIN")
     engine.attach(player)
+    log.info("init END")
   }
 
   /**
@@ -48,41 +51,53 @@ public final class SimplePlayEngine: @unchecked Sendable {
    - parameter sampleLoop: the audio resource to play
    */
   public func setSampleLoop(_ sampleLoop: SampleLoop) throws -> Bool {
-    if let file = try AVAudioFile.fromBundle(name: sampleLoop.rawValue) {
+    log.info("setSampleLoop BEGIN - \(sampleLoop)")
+    if let file = try AVAudioFile.from(name: sampleLoop.rawValue, bundle: Bundle.module) {
       return try setSampleLoopFile(file)
-    } else {
-      return false
     }
+    log.info("setSampleLoop END - sampleLoop file not found")
+    return false
   }
 
-  public func setSampleLoopFile(_ file: AVAudioFile) throws -> Bool {
+  func setSampleLoopFile(_ file: AVAudioFile) throws -> Bool {
+    log.info("setSampleLoopFile BEGIN")
     if let buffer = try file.load() {
+      log.info("setSampleLoopFile END - loaded from file")
       setSampleLoopBuffer(buffer)
       return true
-    } else {
-      return false
     }
+    log.info("setSampleLoopFile END - failed to load from file")
+    return false
   }
 
-  public func setSampleLoopBuffer(_ buffer: AVAudioPCMBuffer) {
+  func setSampleLoopBuffer(_ buffer: AVAudioPCMBuffer) {
+    log.info("setSampleLoopBuffer BEGIN")
     self.buffer = buffer
+    log.info("setSampleLoopBuffer END")
   }
 
   @discardableResult
   private func wireAudioPath() -> Bool {
-    guard let buffer else { return false }
+    log.info("wireAudioPath BEGIN")
+    guard let buffer else {
+      log.info("wireAudioPath END - no sample buffer yet")
+      return false
+    }
+
     if let activeEffect {
+      log.info("connection audio unit to engine")
       activeEffect.auAudioUnit.maximumFramesToRender = maximumFramesToRender
       engine.attach(activeEffect)
       engine.disconnectNodeOutput(player)
       engine.connect(player, to: activeEffect, format: buffer.format)
       engine.connect(activeEffect, to: engine.mainMixerNode, format: buffer.format)
+      engine.prepare()
     } else {
+      log.info("no audio unit to wire")
       engine.disconnectNodeOutput(player)
       engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
     }
 
-    engine.prepare()
     return true
   }
 }
@@ -96,29 +111,35 @@ extension SimplePlayEngine {
    - parameter completion: closure to call when finished
    */
   public func connectEffect(audioUnit: AVAudioUnit, completion: @escaping ((Bool) -> Void) = {_ in}) {
+    log.info("connectEffect BEGIN")
     activeEffect = audioUnit
     completion(wireAudioPath())
+    log.info("connectEffect END")
   }
 
   /**
    Start playback of the audio file player.
    */
   public func start() {
+    log.info("start BEGIN")
     self.isPlaying = true
     activeEffect?.auAudioUnit.shouldBypassEffect = false
     stateChangeQueue.async {
       self.startPlaying()
     }
+    log.info("start END")
   }
 
   /**
    Stop playback of the audio file player.
    */
   public func stop() {
+    log.info("stop BEGIN")
     self.isPlaying = false
     stateChangeQueue.async {
       self.stopPlaying()
     }
+    log.info("stop END")
   }
 
   /**
@@ -127,22 +148,27 @@ extension SimplePlayEngine {
    - returns: state of the player
    */
   public func startStop() -> Bool {
+    log.info("startStop BEGIN")
     if isPlaying {
       stop()
     } else {
       start()
     }
+    log.info("startStop END - \(isPlaying)")
     return isPlaying
   }
 
   public func setBypass(_ bypass: Bool) {
+    log.info("setBypass BEGIN - \(bypass)")
     activeEffect?.auAudioUnit.shouldBypassEffect = bypass
+    log.info("setBypass END")
   }
 }
 
 extension SimplePlayEngine {
 
   private func startPlaying() {
+    log.info("startPlaying BEGIN")
     updateAudioSession(active: true)
     do {
       try engine.start()
@@ -154,18 +180,22 @@ extension SimplePlayEngine {
     beginLoop()
     player.prepare(withFrameCount: maximumFramesToRender)
     player.play()
+    log.info("startPlaying END")
   }
 
   private func stopPlaying() {
+    log.info("stopPlaying BEGIN")
     player.stop()
     engine.stop()
     updateAudioSession(active: false)
+    log.info("stopPlaying END")
   }
 }
 
 extension SimplePlayEngine {
 
   private func updateAudioSession(active: Bool) {
+    log.info("updateAudioSession BEGIN")
 #if os(iOS)
     let session = AVAudioSession.sharedInstance()
     do {
@@ -177,6 +207,7 @@ extension SimplePlayEngine {
       fatalError("Could not set Audio Session active \(active). error: \(error).")
     }
 #endif // os(iOS)
+    log.info("updateAudioSession END")
   }
 
   /**
@@ -190,29 +221,4 @@ extension SimplePlayEngine {
   }
 }
 
-extension AVAudioFile {
-
-  internal static func fromBundle(name: String) throws -> AVAudioFile? {
-    let parts = name.split(separator: .init("."))
-    let filename = String(parts[0])
-    let ext = String(parts[1])
-    if let url = Bundle.module.url(forResource: filename, withExtension: ext) {
-      return try AVAudioFile(forReading: url)
-    } else {
-      return nil
-    }
-  }
-
-  internal func load() throws -> AVAudioPCMBuffer? {
-    self.framePosition = 0
-    guard let buffer = AVAudioPCMBuffer(
-      pcmFormat: self.processingFormat,
-      frameCapacity: AVAudioFrameCount(self.length)
-    ) else {
-      return nil
-    }
-
-    try self.read(into: buffer)
-    return buffer
-  }
-}
+private let log = Logger(category: "SimplePlayEngine")

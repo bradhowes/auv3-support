@@ -122,8 +122,12 @@ extension AudioUnitLoaderFeature {
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
     @Dependency(\.avAudioComponentsClient) var avAudioComponentsClient
     log.info("scanComponents BEGIN - \(componentDescription.description)")
+    var query = componentDescription
+    query.componentFlagsMask = 0xFFFF
+
     while true {
-      let components = avAudioComponentsClient.query(componentDescription)
+      let components = avAudioComponentsClient.query(query)
+      log.info("query - \(components.count)")
       if !components.isEmpty {
         do {
           log.info("instantiating component")
@@ -178,7 +182,7 @@ private let log = Logger(category: "AudioUnitLoader")
 #Preview {
   let acd = AudioComponentDescription(
     componentType: FourCharCode("aufx"),
-    componentSubType: FourCharCode("delY"),
+    componentSubType: FourCharCode("dely"),
     componentManufacturer: FourCharCode("appl"),
     componentFlags: 0,
     componentFlagsMask: 0

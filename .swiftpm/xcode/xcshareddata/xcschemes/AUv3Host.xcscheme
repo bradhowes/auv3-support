@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BDF599782E284D630093A134"
-               BuildableName = "AUv3Demo.app"
-               BlueprintName = "AUv3Demo"
-               ReferencedContainer = "container:AUv3Demo.xcodeproj">
+               BlueprintIdentifier = "AUv3Host"
+               BuildableName = "AUv3Host"
+               BlueprintName = "AUv3Host"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,34 +30,10 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:../AUv3Demo.xctestplan"
+            reference = "container:AUv3Host.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BDF5999E2E284D640093A134"
-               BuildableName = "AUv3DemoTests.xctest"
-               BlueprintName = "AUv3DemoTests"
-               ReferencedContainer = "container:AUv3Demo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BDF599A82E284D640093A134"
-               BuildableName = "AUv3DemoUITests.xctest"
-               BlueprintName = "AUv3DemoUITests"
-               ReferencedContainer = "container:AUv3Demo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -69,16 +45,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BDF599782E284D630093A134"
-            BuildableName = "AUv3Demo.app"
-            BlueprintName = "AUv3Demo"
-            ReferencedContainer = "container:AUv3Demo.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -86,16 +52,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BDF599782E284D630093A134"
-            BuildableName = "AUv3Demo.app"
-            BlueprintName = "AUv3Demo"
-            ReferencedContainer = "container:AUv3Demo.xcodeproj">
+            BlueprintIdentifier = "AUv3Host"
+            BuildableName = "AUv3Host"
+            BlueprintName = "AUv3Host"
+            ReferencedContainer = "container:">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

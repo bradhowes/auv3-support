@@ -36,4 +36,8 @@ public protocol AudioRenderer: AUParameterHandler {
   func getBypass() -> Bool
 
   func setBypass(_ bypass: Bool)
+
+  // func getMaxFramesToRender() -> AUAudioFrameCount
+
+  // func setMaxFramesToRender(_ maxFramesToRender: AUAudioFrameCount)
 }

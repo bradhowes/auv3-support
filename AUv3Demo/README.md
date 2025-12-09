@@ -18,5 +18,3 @@ both the app and the app extension automatically by the build process. They are 
 the right `Bundle` -- see the [Bundle extensions](../Sources/AUv3Shared/Bundle.swift) for details.
 
 # Host App
-
-

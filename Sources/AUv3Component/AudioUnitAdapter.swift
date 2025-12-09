@@ -1,24 +1,24 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
 import AudioToolbox.AUAudioUnit
+import AUv3Shared
 import AVFoundation.AVAudioFormat
 import CoreAudioKit.AUViewController
 import DSPHeaders
 
-import os.log
-
 /**
- Derivation of AUAudioUnit that provides a Swift container for the C++ Kernel (by way of the Obj-C Bridge adapter).
+ Derivation of AUAudioUnit that provides a Swift container for the C++ Kernel (by way of Swift/C++ interoperability).
  Provides for factory presets and user preset management. This basically a generic container for audio rendering as all
  of the elements specific to a particular filter/instrument are found elsewhere.
 
  The actual rendering logic resides in the Kernel C++ code which is abstracted away as an `AudioRenderer` entity.
  Similarly, parameters for controlling the audio unit are provided by an abstract `ParameterSource` entity. The rest of the
  code is in support of the AUv3 interface.
+
+ Unlike Apple demo code, our audio unit here is not fully-realized at the conclusion of the `init` call. Instead, we require
+ an additional `configure` call to receive the kernel to use, the parameters, and the factory presets.
  */
 public final class AudioUnitAdapter: AUAudioUnit, @unchecked Sendable {
-
-  private let log: OSLog = OSLog(subsystem: "com.braysoftware.AUv3Support", category: "AudioUnitAdapter")
 
   /// Initial sample rate when initialized
   static private let defaultSampleRate: Double = 44_100.0
@@ -70,17 +70,15 @@ public final class AudioUnitAdapter: AUAudioUnit, @unchecked Sendable {
     componentDescription: AudioComponentDescription,
     options: AudioComponentInstantiationOptions
   ) throws {
-    os_log(.info, log: log, "init - BEGIN %ld", componentDescription.componentFlags)
-
+    log.info("init BEGIN")
     inputBus = try Self.makeAudioBus()
     outputBus = try Self.makeAudioBus()
-
     try super.init(componentDescription: componentDescription, options: options)
-    os_log(.info, log: log, "init - END")
+    log.info("init - END")
   }
 
   deinit {
-    os_log(.info, log: log, "deinit")
+    log.info("deinit")
   }
 }
 
@@ -96,6 +94,7 @@ extension AudioUnitAdapter {
    - parameter kernel: the rendering kernel to use
    */
   public func configure(parameters: ParameterSource, kernel: AudioRenderer) {
+    log.info("configure BEGIN")
     self.parameters = parameters
     self.kernel = kernel
     self.shim = DSPHeaders.RenderBlockShim(kernel.bridge())
@@ -103,12 +102,13 @@ extension AudioUnitAdapter {
     // Install handler that provides a value for an AUParameter in the parameter tree.
     parameters.parameterTree.implementorValueProvider = kernel.getParameterValueProviderBlock()
 
-    // Install handler that updates an AUParameter in the parameter tree with a new value.
+    // Install handler that fires when an AUParameter in the parameter tree changes value.
     parameters.parameterTree.implementorValueObserver = kernel.getParameterValueObserverBlock()
 
     // At start, configure effect to do something interesting. Hosts can and should update the effect state after it is
     // initialized via `fullState` attribute.
     currentPreset = parameters.factoryPresets.first
+    log.info("configure END")
   }
 }
 
@@ -205,7 +205,7 @@ extension AudioUnitAdapter {
    routine should `setRenderResourcesAllocated(false)`.
    */
   override public func allocateRenderResources() throws {
-    os_log(.info, log: log, "allocateRenderResources - BEGIN")
+    log.info("allocateRenderResources BEGIN")
 
     guard let kernel else {
       throw NSError(domain: NSOSStatusErrorDomain, code: Int(kAudioUnitErr_FailedInitialization), userInfo: nil)
@@ -226,7 +226,7 @@ extension AudioUnitAdapter {
 
     try super.allocateRenderResources()
 
-    os_log(.info, log: log, "allocateRenderResources - END")
+    log.info("allocateRenderResources END")
   }
 
   /**
@@ -259,3 +259,5 @@ extension AudioUnitAdapter {
     viewConfigurationManager?.selectViewConfiguration(viewConfiguration)
   }
 }
+
+private let log = Logger(category: "AudioUnitAdapter")

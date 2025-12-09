@@ -1,5 +1,6 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
+import AUv3Shared
 import AVFoundation
 import ComposableArchitecture
 import SwiftUI
@@ -10,7 +11,6 @@ import SwiftUI
  */
 @Reducer
 public struct EngineFeature {
-  @Dependency(\.simplePlayEngine) var engine
 
   @ObservableState
   public struct State: Equatable {
@@ -27,8 +27,11 @@ public struct EngineFeature {
     case connectEffect(AVAudioUnit, SampleLoop)
   }
 
+  @Dependency(\.simplePlayEngine) var engine
+
   public var body: some Reducer<State, Action> {
     Reduce { state, action in
+      log.info("reduce \(action)")
       switch action {
 
       case .bypassButtonTapped:
@@ -52,12 +55,15 @@ public struct EngineFeature {
   }
 
   private func connectEffect(_ state: inout State, audioUnit: AVAudioUnit, sampleLoop: SampleLoop) -> Effect<Action> {
+    log.info("connectEffect BEGIN - \(audioUnit)")
     engine.stop()
     do {
       if try !engine.setSampleLoop(sampleLoop) {
+        log.info("failed to set sample loop")
         return .none
       }
     } catch {
+      log.info("errorfailed to set sample loop")
       return .none
     }
 
@@ -121,6 +127,8 @@ struct ControlButton: ButtonStyle {
       .imageScale(.large)
   }
 }
+
+private let log = Logger(category: "EngineFeature")
 
 #if DEBUG
 

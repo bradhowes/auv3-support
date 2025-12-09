@@ -33,6 +33,7 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
 
   public var audioUnit: AudioUnitAdapter? {
     didSet {
+      log.info("audioUnit (get) called - \(audioUnit) \(self.isViewLoaded)")
       if self.isViewLoaded,
          let audioUnit = self.audioUnit {
         self.configureSwiftUIView(audioUnit: audioUnit)
@@ -50,10 +51,13 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
    */
   @discardableResult nonisolated
   public func installAudioUnit(_ audioUnit: AudioUnitAdapter) -> AudioUnitAdapter {
+    log.info("installAudioUnit BEGIN")
     DispatchQueue.main.async {
-      precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
+      log.info("setting audioUnit \(self.audioUnit)")
+      // precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
       self.audioUnit = audioUnit
     }
+    log.info("installAudioUnit BEGIN")
     return audioUnit
   }
 
@@ -63,17 +67,23 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
    - parameter audioUnit: the AudioUnitAdapter instance to work with
    */
   private func configureSwiftUIView(audioUnit: AudioUnitAdapter) {
+    log.info("configureSwiftUIView BEGIN")
     if let host = hostingController {
+      log.info("removing old host")
       host.removeFromParent()
       host.view.removeFromSuperview()
     }
 
     // Create new host controller to manage the audio unit's UI view.
+    log.info("creating new host")
     let host = HCF.make(audioUnit: audioUnit)
+    log.info("new host - \(host)")
 
 #if os(macOS)
     host.view.wantsLayer = true
 #endif
+
+    log.info("linking up host and view")
 
     self.addChild(host)
     host.view.frame = self.view.bounds
@@ -87,6 +97,9 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
     host.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
     host.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
     self.view.bringSubviewToFront(host.view)
+
+    log.info("configureSwiftUIView END")
   }
 }
 
+private let log = Logger(category: "AudioUnitViewControllerBase")

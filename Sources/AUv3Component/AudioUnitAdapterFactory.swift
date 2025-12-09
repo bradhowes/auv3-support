@@ -18,7 +18,7 @@ public enum AudioUnitAdapterFactory {
     viewConfigurationManager: AudioUnitViewConfigurationManager? = nil
   ) throws -> AudioUnitAdapter {
 #if os(macOS) && DEBUG
-    let options: AudioComponentInstantiationOptions = []
+    let options: AudioComponentInstantiationOptions = [.loadInProcess]
 #else
     let options: AudioComponentInstantiationOptions = [.loadOutOfProcess]
 #endif
