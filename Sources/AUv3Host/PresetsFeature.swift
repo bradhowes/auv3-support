@@ -159,9 +159,12 @@ public struct PresetsFeature {
     state.source = source
     state.factoryPresets = source.factoryPresetsNonNil
     state.userPresets = source.userPresets
-    return .run { send in
-      await Self.monitorCurrentPreset(source: source, send: send)
-    }.cancellable(id: CancelId.monitorCurrentPreset)
+    return .concatenate(
+      factoryPresetPicked(&state, index: 0),
+      .run { send in
+        await Self.monitorCurrentPreset(source: source, send: send)
+      }.cancellable(id: CancelId.monitorCurrentPreset)
+    )
   }
 
   private static func monitorCurrentPreset(source: AUAudioUnit, send: Send<Action>) async {
