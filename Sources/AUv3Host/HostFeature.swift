@@ -18,9 +18,6 @@ public extension EnvironmentValues {
  */
 @Reducer
 public struct HostFeature {
-  let engine = EngineFeature()
-  let loader = AudioUnitLoaderFeature()
-  let presets = PresetsFeature()
 
   @ObservableState
   public struct State: Equatable {
@@ -63,9 +60,9 @@ public struct HostFeature {
   }
 
   public var body: some ReducerOf<Self> {
-    Scope(state: \.engine, action: \.engine) { engine }
-    Scope(state: \.loader, action: \.loader) { loader }
-    Scope(state: \.presets, action: \.presets) { presets }
+    Scope(state: \.engine, action: \.engine) { EngineFeature() }
+    Scope(state: \.loader, action: \.loader) { AudioUnitLoaderFeature() }
+    Scope(state: \.presets, action: \.presets) { PresetsFeature() }
 
     Reduce { state, action in
       switch action {
@@ -106,11 +103,8 @@ public struct HostFeature {
     }
 
     return .concatenate(
-      engine.connectEffect(&state.engine, audioUnit: payload.audioUnit, sampleLoop: state.sampleLoop).map(Action.engine),
-      presets.setSource(&state.presets, source: payload.audioUnit.auAudioUnit).map(Action.presets),
-      .run { send in
-        await send(.presets(.factoryPresetPicked(0)))
-      }
+      reduce(into: &state, action: .engine(.connectEffect(payload.audioUnit, state.sampleLoop))),
+      reduce(into: &state, action: .presets(.setSource(payload.audioUnit.auAudioUnit))),
     )
   }
 
@@ -157,10 +151,10 @@ public struct HostView: View {
       }
       .padding([.top], 8)
     }
-    .disabled(store.initialNotice != nil)
+    .disabled(store.showNotice)
     .background(.black)
     .overlay {
-      if store.initialNotice != nil {
+      if store.showNotice {
         // Dim the audio unit and host controls and block interaction with them while the notice is shown
         Rectangle()
           .fill(Color.black.opacity(0.5))
