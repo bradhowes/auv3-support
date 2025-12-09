@@ -17,11 +17,15 @@ public struct AudioUnitLoaderFeature {
     let componentDescription: AudioComponentDescription
     let maxWait: Duration
     var finished = false
-    var status: String = "Searching…"
+    var status: String
 
     public init(componentDescription: AudioComponentDescription, maxWait: Duration = .seconds(15)) {
       self.componentDescription = componentDescription
       self.maxWait = maxWait
+      self.status = """
+Searching for audio unit '\(componentDescription.componentSubType.stringValue)' / \
+'\(componentDescription.componentManufacturer.stringValue)'…
+"""
     }
   }
 
@@ -41,45 +45,57 @@ public struct AudioUnitLoaderFeature {
     case failed(AudioUnitLoaderError)
   }
 
-  let maxWaitTaskId = "AudioUnitLoaderFeature.maxWaitTask"
-  let scanningTaskId = "AudioUnitLoaderFeature.scanningTask"
-
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
+      log.info("reduce \(action)")
       switch action {
       case .audioUnitCreated(let success): return finish(&state, result: .success(success))
       case .audioUnitCreationFailed(let failure): return finish(&state, result: .failure(failure))
       case .delegate: return .none
       case .maxWaitReached: return finish(&state, result: .failure(.componentNotFound))
-      case .stopScanning: return .merge(.cancel(id: scanningTaskId), .cancel(id: maxWaitTaskId))
+      case .stopScanning: return cancelTasks()
       case .task: return startScanning(&state)
       }
     }
+  }
+
+  enum CancelId: CaseIterable {
+    case maxWait
+    case scanning
   }
 }
 
 extension AudioUnitLoaderFeature {
 
+  private func cancelTasks() -> Effect<Action> {
+    log.info("cancelTasks BEGIN")
+    return .merge(CancelId.allCases.map { .cancel(id: $0) })
+  }
+
   private func finish(
     _ state: inout State,
     result: Result<AudioUnitLoaderSuccess, AudioUnitLoaderError>
   ) -> Effect<Action> {
-    guard !state.finished else { return .none }
+    log.info("finish BEGIN")
+    guard !state.finished else {
+      log.info("finish END - already finished")
+      return .none
+    }
     state.finished = true
     switch result {
     case .success(let success):
-      state.status = ""
+      state.status = "Found"
+      log.info("finish END - success")
       return .merge(
         .send(.delegate(.found(success))),
-        .cancel(id: scanningTaskId),
-        .cancel(id: maxWaitTaskId)
+        cancelTasks()
       )
     case .failure(let failure):
-      state.status = failure.localizedDescription
+      state.status = failure.description
+      log.info("finish END - failure: \(state.status)")
       return .merge(
         .send(.delegate(.failed(failure))),
-        .cancel(id: scanningTaskId),
-        .cancel(id: maxWaitTaskId)
+        cancelTasks()
       )
     }
   }
@@ -87,33 +103,41 @@ extension AudioUnitLoaderFeature {
   private func startScanning(_ state: inout State) -> Effect<Action> {
     let maxWait = state.maxWait
     let componentDescription = state.componentDescription
+    log.info("startScanning BEGIN - \(componentDescription.description)")
     return .merge(
       .run { await Self.maxWaitTask(duration: maxWait, send: $0) }
-        .cancellable(id: maxWaitTaskId, cancelInFlight: true),
+        .cancellable(id: CancelId.maxWait, cancelInFlight: true),
       .run { await Self.scanComponents(for: componentDescription, send: $0) }
-        .cancellable(id: scanningTaskId, cancelInFlight: true)
+        .cancellable(id: CancelId.scanning, cancelInFlight: true)
     )
   }
 
   private static func maxWaitTask(duration: Duration, send: Send<Action>) async {
+    log.info("maxWaitTask BEGIN - \(duration)")
     try? await Task.sleep(for: duration)
     await send(.maxWaitReached)
+    log.info("maxWaitTask END")
   }
 
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
     @Dependency(\.avAudioComponentsClient) var avAudioComponentsClient
-
+    log.info("scanComponents BEGIN - \(componentDescription.description)")
     while true {
       let components = avAudioComponentsClient.query(componentDescription)
       if !components.isEmpty {
         do {
+          log.info("instantiating component")
           let audioUnit = try await avAudioComponentsClient.instantiate(componentDescription)
+          log.info("instantiating view")
           if let viewController = await avAudioComponentsClient.requestViewController(audioUnit) {
+            log.info("success")
             await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           } else {
+            log.info("nil view countroller")
             await send(.audioUnitCreationFailed(.nilViewController))
           }
         } catch {
+          log.info("failure - \(error.localizedDescription)")
           await send(.audioUnitCreationFailed(.framework(error: error.localizedDescription)))
         }
         break
@@ -131,7 +155,6 @@ public struct AudioUnitLoaderView: View {
   }
 
   public var body: some View {
-    let _ = Self._printChanges()
     VStack {
       Spacer()
       HStack {
@@ -148,10 +171,14 @@ public struct AudioUnitLoaderView: View {
   }
 }
 
+private let log = Logger(category: "AudioUnitLoader")
+
+#if DEBUG
+
 #Preview {
   let acd = AudioComponentDescription(
     componentType: FourCharCode("aufx"),
-    componentSubType: FourCharCode("dely"),
+    componentSubType: FourCharCode("delY"),
     componentManufacturer: FourCharCode("appl"),
     componentFlags: 0,
     componentFlagsMask: 0
@@ -166,3 +193,5 @@ public struct AudioUnitLoaderView: View {
     AudioUnitLoaderView(store: store)
   }.environment(\.colorScheme, .dark)
 }
+
+#endif // DEBUG
