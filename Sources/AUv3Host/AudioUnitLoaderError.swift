@@ -19,8 +19,8 @@ public enum AudioUnitLoaderError: Error, Equatable {
   public var description: String {
     switch self {
     case .nilAudioUnit: return "Failed to obtain a usable audio unit instance."
-    case .nilViewController: return "Failed to obtain a usable view controller from the instantiated audio unit."
-    case .componentNotFound: return "Failed to locate the right AUv3 component to instantiate."
+    case .nilViewController: return "Failed to obtain a view controller from the audio unit."
+    case .componentNotFound: return "Failed to locate the AUv3 component to instantiate."
     case .framework(let err): return "Framework error: \(err)"
     }
   }
