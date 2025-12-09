@@ -12,12 +12,12 @@ import SwiftUI
 struct ViewControllerFactory: HostingControllerFactory {
 
   /**
-   Custom factory for creating the SwiftUI view
+   Custom factory for creating the SwiftUI view of the audio unit. Satisfies the `HostingControllerFactory` requirement.
 
    - parameter audioUnit: the audio unit to install
    - returns: the view controller that is hosting the SwiftUI view of the audio unit
    */
-  static func make(audioUnit: FilterAudioUnit) -> AUv3HostingController<AUMainView> {
+  static func make(audioUnit: AudioUnitAdapter) -> AUv3HostingController<AUMainView> {
     guard let parameterTree = audioUnit.parameterTree,
           let gain = parameterTree.parameter(withAddress: AUv3Demo_ParameterAddress.gain.rawValue)
     else {
@@ -35,7 +35,7 @@ struct ViewControllerFactory: HostingControllerFactory {
 class AudioUnitViewController: AudioUnitViewControllerBase<ViewControllerFactory>, AUAudioUnitFactory {
 
   /**
-   Entry point for creatiing a new AUv3 component.
+   Entry point for creating a new AUv3 component. Satisfies `AUAudioUnitFactory` protocol requirement.
 
    - parameter componentDescription: specification of the AUv3 component to create
    - returns: new AUAudioUnit instance
@@ -43,7 +43,7 @@ class AudioUnitViewController: AudioUnitViewControllerBase<ViewControllerFactory
   nonisolated public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
     let bundle = InternalConstants.bundle
     return installAudioUnit(
-      try FilterAudioUnitFactory.create(
+      try AudioUnitAdapterFactory.create(
         componentDescription: componentDescription,
         parameters: Parameters(),
         kernel: AUv3Demo_Kernel.make(std.string(bundle.auBaseName)),

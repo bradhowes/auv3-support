@@ -16,6 +16,6 @@ public protocol HostingControllerFactory {
    - parameter audioUnit: the audio unit to show in the hosted view
    - returns: new AUv3HostingController instance
    */
-  static func make(audioUnit: FilterAudioUnit) -> AUv3HostingController<AUv3View>
+  static func make(audioUnit: AudioUnitAdapter) -> AUv3HostingController<AUv3View>
 }
 

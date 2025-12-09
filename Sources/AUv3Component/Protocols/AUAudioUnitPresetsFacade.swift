@@ -27,7 +27,7 @@ public protocol AUAudioUnitPresetsFacade: NSObject, Sendable {
   var supportsUserPresets: Bool { get }
 
   /**
-   Clears the `currentPreset` attribute if it currently holds a factory preset. This is used by filter UIs to support
+   Clears the `currentPreset` attribute if it currently holds a factory preset. This is used by audio unit UIs to support
    user presets in a meaningful and useful way:
 
    - changing a parameter with a factory preset will no longer show a preset being chosen so that it is clear to the

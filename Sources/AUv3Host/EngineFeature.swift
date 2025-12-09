@@ -4,6 +4,10 @@ import AVFoundation
 import ComposableArchitecture
 import SwiftUI
 
+/**
+ Provides an audio engine to exercise an filtering audio unit. Wires up an audio unit so that it receives audio samples from a file
+ and sends the filtered results to the device's speaker.
+ */
 @Reducer
 public struct EngineFeature {
   @Dependency(\.simplePlayEngine) var engine
@@ -115,9 +119,10 @@ struct ControlButton: ButtonStyle {
       .background(.black)
       .foregroundStyle(themeControlColor)
       .imageScale(.large)
-      // .clipShape(RoundedRectangle(cornerSize: CGSize(width: 16, height: 16)))
   }
 }
+
+#if DEBUG
 
 struct EngineViewPreview: PreviewProvider {
   static var store = Store(initialState: EngineFeature.State(isEnabled: true)) { EngineFeature() }
@@ -128,3 +133,5 @@ struct EngineViewPreview: PreviewProvider {
     }
   }
 }
+
+#endif // DEBUG

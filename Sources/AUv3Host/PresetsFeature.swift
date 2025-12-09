@@ -326,13 +326,13 @@ public struct PresetsMenu: View {
       }
       .disabled(store.activePrompt.name.isEmpty)
     }
-#endif
+#endif // os(iOS)
 #if os(macOS)
     Text(store.currentPresetName)
       .tint(themeLabelColor)
       .font(.callout)
       .lineLimit(1)
-#endif
+#endif // os(macOS)
   }
 
   private var commands: some View {

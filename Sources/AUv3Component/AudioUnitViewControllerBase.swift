@@ -13,7 +13,7 @@ import SwiftUI
  ```
  @MainActor
  struct ViewControllerFactory: HostingControllerFactory {
-   static func make(audioUnit: FilterAudioUnit) -> AUv3HostingController<AUMainView> {
+   static func make(audioUnit: AudioUnitAdapter) -> AUv3HostingController<AUMainView> {
      guard let parameterTree = audioUnit.parameterTree,
            let gain = parameterTree.parameter(withAddress: InteropPlay2AU_ParameterAddress.gain.rawValue)
      else {
@@ -31,7 +31,7 @@ import SwiftUI
 open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewController {
   public var hostingController: AUv3HostingController<HCF.AUv3View>?
 
-  public var audioUnit: FilterAudioUnit? {
+  public var audioUnit: AudioUnitAdapter? {
     didSet {
       if self.isViewLoaded,
          let audioUnit = self.audioUnit {
@@ -49,7 +49,7 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
    - returns the given audio unit value for easy chaining
    */
   @discardableResult nonisolated
-  public func installAudioUnit(_ audioUnit: FilterAudioUnit) -> FilterAudioUnit {
+  public func installAudioUnit(_ audioUnit: AudioUnitAdapter) -> AudioUnitAdapter {
     DispatchQueue.main.async {
       precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
       self.audioUnit = audioUnit
@@ -58,21 +58,21 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
   }
 
   /**
-   Continue initialization of the view using a valid FilterAudioUnit
+   Continue initialization of the view using a valid AudioUnitAdapter
 
-   - parameter audioUnit: the FilterAudioUnit instance to work with
+   - parameter audioUnit: the AudioUnitAdapter instance to work with
    */
-  private func configureSwiftUIView(audioUnit: FilterAudioUnit) {
+  private func configureSwiftUIView(audioUnit: AudioUnitAdapter) {
     if let host = hostingController {
       host.removeFromParent()
       host.view.removeFromSuperview()
     }
 
+    // Create new host controller to manage the audio unit's UI view.
     let host = HCF.make(audioUnit: audioUnit)
 
 #if os(macOS)
     host.view.wantsLayer = true
-    // host.view.layer?.backgroundColor = NSColor.red.cgColor
 #endif
 
     self.addChild(host)

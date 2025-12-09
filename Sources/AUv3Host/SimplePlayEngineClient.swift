@@ -3,6 +3,10 @@
 import AVFoundation
 import Dependencies
 
+/**
+ A collection of methods that interact with a `SimplePlayEngine`. Allows for mocking of the calls during tests and previews.
+ The `liveValue` is what will be used when running the app.
+ */
 struct SimplePlayEngineClient: @unchecked Sendable {
   var setSampleLoop: (_ loop: SampleLoop) throws -> Bool
   var connectEffect: (_ audioUnit: AVAudioUnit) -> Void

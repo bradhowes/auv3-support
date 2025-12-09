@@ -3,7 +3,7 @@
 import Foundation
 import CoreAudioKit.AUViewController
 
-/// Protocol for delegates that handle view configuration. The FilterAudioUnit has no concern for this stuff.
+/// Protocol for delegates that handle view configuration. The AudioUnitAdapter has no concern for this stuff.
 public protocol AudioUnitViewConfigurationManager: AnyObject {
 
   /**

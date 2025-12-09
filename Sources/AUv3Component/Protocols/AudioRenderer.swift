@@ -7,7 +7,7 @@ import DSPHeaders
 /**
  Protocol for a Swift/Obj-C++ kernel that can perform audio sample rendering. There is an issue providing an
  AUInternalRenderBlock value from conforming instances, so there is a `TypeErasedKernel` value that is used by a
- `RenderBlockShim` to provide one for the `FilterAudioUnit`.
+ `RenderBlockShim` to provide one for the `AudioUnitAdapter`.
  */
 public protocol AudioRenderer: AUParameterHandler {
 

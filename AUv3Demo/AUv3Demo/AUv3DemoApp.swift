@@ -9,7 +9,7 @@ struct AUv3DemoApp: App {
 
   let config = HostConfig(
     name: Bundle.main.auComponentName,
-    version: "1.0.0",
+    version: Bundle.main.versionTag,
     appStoreId: Bundle.main.appStoreId,
     componentDescription: .init(
       componentType: Bundle.main.auComponentType,
@@ -21,7 +21,7 @@ struct AUv3DemoApp: App {
     sampleLoop: .sample1,
     appStoreVisitor: { _ in },
     maxWait: .seconds(15),
-    alwaysShowNotice: false
+    alwaysShowNotice: true
   )
 
   var body: some Scene {

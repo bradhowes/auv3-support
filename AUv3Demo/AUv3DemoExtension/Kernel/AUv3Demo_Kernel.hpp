@@ -12,9 +12,7 @@
 #import "AUv3Demo_ParameterAddress.h"
 
 /**
- The audio processing kernel that generates a "chorus" effect by combining an audio signal with a slightly delayed copy
- of itself. The delay value oscillates at a defined frequency which causes the delayed audio to vary in pitch due to it
- being sped up or slowed down.
+ The audio processing kernel that generates a "gain" effect by scaling the samples of an audio signal.
 
  Most of the plumbing and state management is handle by the `EventProcessor` template base class. However, due to
  current limitations in Swift/C++ interoperability, public base class methods are not visible to Swift, so there are
@@ -89,7 +87,7 @@ public:
    below fail due to type mismatch between Swift and C++ that I was unable to overcome. This workaround type erases this
    kernel while still providing access to our `processAndRender` method and its typed parameters. Another C++ class
    takes this value and uses it inside the block returned in the `AUInternalRenderBlock` block obtained from the
-   `FilterAudioUnit::internalRenderBlock` attribute.
+   `AudioUnitAdapter::internalRenderBlock` attribute.
 
    @returns `TypeErasedKernel` instance
    */

@@ -176,7 +176,7 @@ extension SimplePlayEngine {
     } catch {
       fatalError("Could not set Audio Session active \(active). error: \(error).")
     }
-#endif
+#endif // os(iOS)
   }
 
   /**

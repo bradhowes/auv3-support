@@ -14,13 +14,13 @@ Swift package containing useful code for AUv3 app extensions. There are three pr
   platforms.
 - [AUv3Host][h] -- classes that provide a simple AUv3 hosting environment for the AUv3 app extension. Provides an audio
   chain that sends a sample loop through the AUv3 audio unit and out to the main speaker. The host supports user presets.
-- [AUv3Component][c] -- classes specific to an AUv3 component. Foremost is the [FilterAudioUnit][fau] class that
+- [AUv3Component][c] -- classes specific to an AUv3 component. Foremost is the [AudioUnitAdapter][aua] class that
   provides a generic AUv3 container for a custom DSP kernel that performs the signal processing. Additional Swift types
   provide useful parameter functionality.
 
 Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][dh] repo. Of particular note is the 
 [EventProcessor][ep] template class that provides a complete foundation for a C++ DSP kernel that can be used in Swift and
-put in [FilterAudioUnit][fau] container.
+put in [AudioUnitAdapter][aua] container.
 
 # Demo App
 
@@ -61,7 +61,7 @@ Otherwise, the functionality remains pretty much the same between the two packag
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [ac]: https://github.com/bradhowes/AUv3Controls
 [sc]: https://github.com/bradhowes/brh-segmented-control
-[fau]: Sources/AUv3Component/FilterAudioUnit.swift
+[aua]: Sources/AUv3Component/AudioUnitAdapter.swift
 [ep]: https://github.com/bradhowes/DSPHeaders/Sources/DSPHeaders/include/DSPHeaders/EventProcessor.hpp
 
 [ci]: https://github.com/bradhowes/auv3-support/actions/workflows/CI.yml

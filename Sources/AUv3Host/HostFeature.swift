@@ -11,6 +11,11 @@ public extension EnvironmentValues {
   @Entry var tintColor: Color = .blue
 }
 
+/**
+ Feature that acts as an AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription` attribute found in a `HostConfig`
+ instance. Once loaded, it is wired into an audio processing graph so that it will receive pre-recorded samples from an audio file and its rendered samples
+ will go to the device's main speakers.
+ */
 @Reducer
 public struct HostFeature {
   let engine = EngineFeature()
@@ -31,6 +36,7 @@ public struct HostFeature {
     var auViewController: AUv3ViewController?
     var failureError: String?
     var initialNotice: String?
+    var showNotice: Bool = false
 
     public init(config: HostConfig) {
       let seenNotice = config.defaults.bool(forKey: "seenInitialNotice")
@@ -53,7 +59,7 @@ public struct HostFeature {
     case loader(AudioUnitLoaderFeature.Action)
     case presets(PresetsFeature.Action)
     case versionButtonTapped
-    case dismissInitialNotice
+    case dismissNotice
   }
 
   public var body: some ReducerOf<Self> {
@@ -69,8 +75,9 @@ public struct HostFeature {
       case .engine: return .none
       case .loader: return .none
       case .presets: return .none
-      case .dismissInitialNotice:
-        state.initialNotice = nil
+      case .dismissNotice:
+        state.showNotice = false
+        state.failureError = nil
         return .none.animation()
       }
     }
@@ -93,6 +100,11 @@ public struct HostFeature {
   private func loaderFound(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
     state.audioUnit = payload.audioUnit
     state.auViewController = payload.viewController
+
+    if state.initialNotice != nil {
+      state.showNotice = true
+    }
+
     return .concatenate(
       engine.connectEffect(&state.engine, audioUnit: payload.audioUnit, sampleLoop: state.sampleLoop).map(Action.engine),
       presets.setSource(&state.presets, source: payload.audioUnit.auAudioUnit).map(Action.presets),
@@ -155,12 +167,15 @@ public struct HostView: View {
       }
     }
     .overlay {
-      if let notice = store.initialNotice {
-        initiallNotice(notice: notice)
-          .transition(.push(from: .bottom))
+      if store.showNotice,
+         let notice = store.initialNotice {
+        showNotice(notice: notice)
+      } else if let failure = store.failureError {
+        showNotice(notice: failure)
       }
     }
     .animation(.default, value: store.initialNotice)
+    .animation(.default, value: store.failureError)
     .padding([.leading, .trailing], 8)
     .environment(\.colorScheme, .dark)
 #if os(iOS)
@@ -172,14 +187,14 @@ public struct HostView: View {
     Spacer(minLength: minSpacerWidth)
   }
 
-  func initiallNotice(notice: String) -> some View {
+  func showNotice(notice: String) -> some View {
     HStack {
       spacer
       VStack {
         spacer
         VStack(spacing: stackSpacing) {
           Text(notice)
-          Button("OK") { store.send(.dismissInitialNotice) }
+          Button("OK") { store.send(.dismissNotice) }
         }
         .frame(maxWidth: maxFrameWidth)
         .foregroundStyle(store.themeLabelColor)

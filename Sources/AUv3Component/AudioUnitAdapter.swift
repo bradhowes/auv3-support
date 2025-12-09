@@ -9,16 +9,16 @@ import os.log
 
 /**
  Derivation of AUAudioUnit that provides a Swift container for the C++ Kernel (by way of the Obj-C Bridge adapter).
- Provides for factory presets and user preset management. This basically a generic container for audio filtering as all
- of the elements specific to a particular filter/effect are found elsewhere.
+ Provides for factory presets and user preset management. This basically a generic container for audio rendering as all
+ of the elements specific to a particular filter/instrument are found elsewhere.
 
- The actual filtering logic resides in the Kernel C++ code which is abstracted away as an `AudioRenderer` entity.
- Similarly, parameters for controlling the filter are provided by an abstract `ParameterSource` entity. The rest of the
+ The actual rendering logic resides in the Kernel C++ code which is abstracted away as an `AudioRenderer` entity.
+ Similarly, parameters for controlling the audio unit are provided by an abstract `ParameterSource` entity. The rest of the
  code is in support of the AUv3 interface.
  */
-public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
+public final class AudioUnitAdapter: AUAudioUnit, @unchecked Sendable {
 
-  private let log: OSLog = OSLog(subsystem: "com.braysoftware.AUv3Support", category: "FilterAudioUnit")
+  private let log: OSLog = OSLog(subsystem: "com.braysoftware.AUv3Support", category: "AudioUnitAdapter")
 
   /// Initial sample rate when initialized
   static private let defaultSampleRate: Double = 44_100.0
@@ -45,7 +45,7 @@ public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
   /// The signal processing kernel that performs the rendering of audio samples.
   private var kernel: AudioRenderer!
 
-  /// A shim that provides a AUInternalRenderBlock value for the FilterAudioUnit. This is used due to issues with the
+  /// A shim that provides a AUInternalRenderBlock value for the AudioUnitAdapter. This is used due to issues with the
   /// current Swift/C++ interop.
   private var shim: DSPHeaders.RenderBlockShim!
 
@@ -86,7 +86,7 @@ public final class FilterAudioUnit: AUAudioUnit, @unchecked Sendable {
 
 // MARK: - Configuration
 
-extension FilterAudioUnit {
+extension AudioUnitAdapter {
 
   /**
    Install the entity that provides the AUParameter definitions for the AUParameterTree (it also may hold factory
@@ -114,7 +114,7 @@ extension FilterAudioUnit {
 
 // MARK: - AUv3 Properties
 
-extension FilterAudioUnit {
+extension AudioUnitAdapter {
 
   /// Valid combinations of input and output channel counts. Support any number of channels, as long as input and
   /// output counts match.
@@ -126,17 +126,17 @@ extension FilterAudioUnit {
   /// The output busses supported by the component. We only support one.
   override public var outputBusses: AUAudioUnitBusArray { _outputBusses }
 
-  /// Parameter tree containing filter parameters that are exposed for external control. No setting is allowed.
+  /// Parameter tree containing the parameters that are exposed for external control. No setting is allowed.
   override public var parameterTree: AUParameterTree? {
     get { parameters.parameterTree }
     set {}
   }
 
-  /// Factory presets for the filter
+  /// Factory presets for the audio unit
   override public var factoryPresets: [AUAudioUnitPreset]? { parameters.factoryPresets }
   /// Announce support for user presets
   override public var supportsUserPresets: Bool { true }
-  /// Announce that the filter can work directly on upstream sample buffers
+  /// Announce that the audio unit can work directly on upstream sample buffers
   override public var canProcessInPlace: Bool { true }
 
   /// Active preset management. Setting a non-nil value updates the components parameters to hold the values found in
@@ -192,7 +192,7 @@ extension FilterAudioUnit {
 
 // MARK: - Rendering
 
-extension FilterAudioUnit {
+extension AudioUnitAdapter {
 
   /// The bypass setting is bridged with the v2 property. We detect when it changes here and forward it to the kernel.
   override public var shouldBypassEffect: Bool {
@@ -245,7 +245,7 @@ extension FilterAudioUnit {
 
 // MARK: - Host View Management
 
-extension FilterAudioUnit {
+extension AudioUnitAdapter {
 
   override public func parametersForOverview(withCount: Int) -> [NSNumber] {
     parameters.parameters[0..<max(1, min(withCount, parameters.parameters.count))].map { NSNumber(value: $0.address) }
