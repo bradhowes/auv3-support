@@ -24,12 +24,12 @@ put in [AudioUnitAdapter][aua] container.
 
 # Demo App
 
-There is a [demo app](AUv3Demo/README.html) that illustrates how to use the [AUv3Host][h] and [AUv3Component][c] modules. 
+There is a [demo app](AUv3Demo) that illustrates how to use the [AUv3Host][h] and [AUv3Component][c] modules. 
 The demo app essentially replicates what is available in Xcode when you ask it to create a new project from the
 "Audio Unit Extension App" template. The app serves as a simple AUv3 host to play audio samples through the AUv3 effect which is 
 just a simple gain control. There is a circular knob that controls the gain of the effect. The knob comes from my 
 [AUv3Controls][ac] package, and it is served from the AUv3 
-component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift). See the [README](AUv3Demo/README.html) for more info.
+component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift). See the [README](AUv3Demo) for more info.
 
 <img src="media/AUv3Demo.png" width="300">
 
