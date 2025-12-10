@@ -49,6 +49,11 @@ For comparison, below is the view of the same app running on macOS:
 
 <img src="media/AUv3Demo_macOS.png" width="400">
 
+The macOS app also offers menus:
+
+<img src="media/Menu_macOS.png">
+
+
 ## History
 
 This is an update of my [AUv3Support][old] package which used UIKit and AppKit and included the DSPHeaders package. This
