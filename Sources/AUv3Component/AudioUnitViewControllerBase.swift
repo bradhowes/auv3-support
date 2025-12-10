@@ -33,7 +33,6 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
 
   public var audioUnit: AudioUnitAdapter? {
     didSet {
-      log.info("audioUnit (get) called - \(audioUnit) \(self.isViewLoaded)")
       if self.isViewLoaded,
          let audioUnit = self.audioUnit {
         self.configureSwiftUIView(audioUnit: audioUnit)
@@ -53,7 +52,7 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
   public func installAudioUnit(_ audioUnit: AudioUnitAdapter) -> AudioUnitAdapter {
     log.info("installAudioUnit BEGIN")
     DispatchQueue.main.async {
-      log.info("setting audioUnit \(self.audioUnit)")
+      log.info("setting audioUnit")
       precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
       self.audioUnit = audioUnit
     }

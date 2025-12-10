@@ -120,6 +120,7 @@ extension AudioUnitLoaderFeature {
     log.info("maxWaitTask END")
   }
 
+  @MainActor
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
     @Dependency(\.avAudioComponentsClient) var avAudioComponentsClient
     log.info("scanComponents BEGIN - \(componentDescription.description)")
@@ -133,16 +134,16 @@ extension AudioUnitLoaderFeature {
         do {
           let audioUnit = try await avAudioComponentsClient.instantiate(componentDescription)
           if let viewController = await avAudioComponentsClient.requestViewController(audioUnit) {
-            await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
+            send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           } else {
             // Apple's AUv3 demo code does this when above fails.
-            let viewController = await AUGenericViewController()
+            let viewController = AUGenericViewController()
             viewController.auAudioUnit = audioUnit.auAudioUnit
-            await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
+            send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           }
         } catch {
           log.info("failure - \(error.localizedDescription)")
-          await send(.audioUnitCreationFailed(.framework(error: error.localizedDescription)))
+          send(.audioUnitCreationFailed(.framework(error: error.localizedDescription)))
         }
         break
       }

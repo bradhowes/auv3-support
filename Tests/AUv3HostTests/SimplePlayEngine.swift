@@ -35,13 +35,13 @@ import Testing
 }
 
 @Test func missingAudioFileFromBundle() throws {
-  let found = try AVAudioFile.fromBundle(name: "blah.foo")
+  let found = try AVAudioFile.from(name: "blah.foo", bundle: Bundle.module)
   #expect(found == nil)
 }
 
 @Test func emptyAudioFileFromBundle() throws {
   #expect(throws: Error.self) {
-    let found = try AVAudioFile.fromBundle(name: "empty.wav")
+    let found = try AVAudioFile.from(name: "empty.wav", bundle: Bundle.module)
     #expect(found == nil)
   }
 }
