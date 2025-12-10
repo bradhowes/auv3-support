@@ -12,9 +12,10 @@ public extension EnvironmentValues {
 }
 
 /**
- Feature that acts as an AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription` attribute found in a `HostConfig`
- instance. Once loaded, it is wired into an audio processing graph so that it will receive pre-recorded samples from an audio file and its rendered samples
- will go to the device's main speakers.
+ Feature that acts as an AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription`
+ attribute found in a `HostConfig` instance. Once loaded, it is wired into an audio processing graph so that it will receive
+ pre-recorded samples from an audio file and its rendered samples will go to the device's main speakers. Most of the work is done
+ by child features.
  */
 @Reducer
 public struct HostFeature {
@@ -52,11 +53,11 @@ public struct HostFeature {
   }
 
   public enum Action {
+    case dismissNotice
     case engine(EngineFeature.Action)
     case loader(AudioUnitLoaderFeature.Action)
     case presets(PresetsFeature.Action)
     case versionButtonTapped
-    case dismissNotice
   }
 
   public var body: some ReducerOf<Self> {
@@ -66,16 +67,16 @@ public struct HostFeature {
 
     Reduce { state, action in
       switch action {
-      case let .loader(.delegate(.found(success))): return loaderFound(&state, payload: success)
-      case let .loader(.delegate(.failed(error))): return loaderFailed(&state, error: error)
-      case .versionButtonTapped: return visitAppStore(&state)
-      case .engine: return .none
-      case .loader: return .none
-      case .presets: return .none
       case .dismissNotice:
         state.showNotice = false
         state.failureError = nil
         return .none.animation()
+      case .engine: return .none
+      case let .loader(.delegate(.found(success))): return loaderFoundComponent(&state, payload: success)
+      case let .loader(.delegate(.failed(error))): return loaderFailed(&state, error: error)
+      case .loader: return .none
+      case .presets: return .none
+      case .versionButtonTapped: return visitAppStore(&state)
       }
     }
   }
@@ -90,11 +91,12 @@ public struct HostFeature {
       await appStoreLinker.visit(appStoreLink)
     }
 #else
+    // TODO: handle visit on macOS
     return .none
 #endif
   }
 
-  private func loaderFound(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
+  private func loaderFoundComponent(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
     state.audioUnit = payload.audioUnit
     state.auViewController = payload.viewController
 

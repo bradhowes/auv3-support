@@ -4,7 +4,7 @@ import AudioToolbox
 import AUv3Shared
 
 /**
- Subset of AUAudioUnit functionality that is used by UserPresetsManager.
+ Subset of AUAudioUnit functionality that is used by `UserPresetsManager` to manage the presets in an audio unit.
  */
 public protocol AUAudioUnitPresetsFacade: NSObject, Sendable {
 

@@ -5,9 +5,15 @@ import AVFoundation
 import CoreAudioKit
 import Dependencies
 
+/**
+ AVAudioComponents functionality broken out into individual closures to facilitate testing and mocking.
+ */
 struct AVAudioComponentsClient: @unchecked Sendable {
+  /// Query the AVAudioComponents for values matching a given `AudioComponentDescription` spec.
   var query: (_ componentDescription: AudioComponentDescription) -> [AVAudioUnitComponent]
+  /// Attempt to instantiate an AUv3 component given a spec.
   var instantiate: (_ componentDescription: AudioComponentDescription) async throws -> AVAudioUnit
+  /// Attempt to obtain a view controller from an AUv3 component.
   var requestViewController: (_ audioUnit: AVAudioUnit) async -> AUv3ViewController?
 }
 

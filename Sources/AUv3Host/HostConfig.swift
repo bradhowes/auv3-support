@@ -3,6 +3,9 @@
 import CoreAudioKit
 import SwiftUI
 
+/**
+ Defines the AUv3 component to host and various display characteristics of the host app.
+ */
 public struct HostConfig {
 
   public let name: String
@@ -26,8 +29,13 @@ public struct HostConfig {
    - parameter appStoreId: the app store ID for the audio unit
    - parameter componentDescription: the description of the audio unit used to find it on the device
    - parameter sampleLoop: the sample loop to play
-   - parameter tintColor: color to use for control tinting
+   - parameter themeControlColor: color to use for control tinting
+   - parameter themeLabelColor: color to use for the control labels
    - parameter appStoreVisitor: the closure to invoke to visit the app store and view the page for the audio unit
+   - parameter maxWait: max time to wait for a result in an AUv3 component query
+   - parameter alwaysShowNotice: true if always showing the 'about' notice instead of just the first time app is run
+   - parameter initialNotice: the notice text to show
+   - parameter defaults: the `UserDefaults` to use for app settings
    */
   public init(
     name: String,

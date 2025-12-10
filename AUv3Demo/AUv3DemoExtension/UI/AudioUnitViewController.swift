@@ -6,7 +6,7 @@ import os
 import SwiftUI
 
 /**
- Custom factory for creating the AUv3 SwifUI view for the audio unit kernel
+ Custom factory for creating the AUv3 SwifUI view for the audio unit kernel.
  */
 @MainActor
 struct ViewControllerFactory: HostingControllerFactory {
@@ -41,7 +41,7 @@ class AudioUnitViewController: AudioUnitViewControllerBase<ViewControllerFactory
    - returns: new AUAudioUnit instance
    */
   nonisolated public func createAudioUnit(with componentDescription: AudioComponentDescription) throws -> AUAudioUnit {
-    let bundle = InternalConstants.bundle
+    let bundle = Bundle(for: Self.self)
     return installAudioUnit(
       try AudioUnitAdapterFactory.create(
         componentDescription: componentDescription,
@@ -54,10 +54,4 @@ class AudioUnitViewController: AudioUnitViewControllerBase<ViewControllerFactory
 }
 
 extension AudioUnitViewController: AudioUnitViewConfigurationManager {}
-
 extension AUv3Demo_Kernel: AudioRenderer {}
-
-private enum InternalConstants {
-  private class EmptyClass {}
-  static let bundle = Bundle(for: InternalConstants.EmptyClass.self)
-}

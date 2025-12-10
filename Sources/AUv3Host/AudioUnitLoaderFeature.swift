@@ -3,6 +3,7 @@
 import AUv3Shared
 import AVFoundation
 import ComposableArchitecture
+import CoreAudioKit
 import SwiftUI
 
 /**
@@ -84,7 +85,7 @@ extension AudioUnitLoaderFeature {
     state.finished = true
     switch result {
     case .success(let success):
-      state.status = "Found"
+      state.status = ""
       log.info("finish END - success")
       return .merge(
         .send(.delegate(.found(success))),
@@ -122,23 +123,22 @@ extension AudioUnitLoaderFeature {
   private static func scanComponents(for componentDescription: AudioComponentDescription, send: Send<Action>) async {
     @Dependency(\.avAudioComponentsClient) var avAudioComponentsClient
     log.info("scanComponents BEGIN - \(componentDescription.description)")
-    var query = componentDescription
-    query.componentFlagsMask = 0xFFFF
 
+    // NOTE: the Apple demo code for AUv3 does not perform a query. It just immediately attempts to instantiate a component.
+    // The code below was necessary when there was a race with the OS noticing the app extension. It could be legacy but it
+    // still works.
     while true {
-      let components = avAudioComponentsClient.query(query)
-      log.info("query - \(components.count)")
+      let components = avAudioComponentsClient.query(componentDescription)
       if !components.isEmpty {
         do {
-          log.info("instantiating component")
           let audioUnit = try await avAudioComponentsClient.instantiate(componentDescription)
-          log.info("instantiating view")
           if let viewController = await avAudioComponentsClient.requestViewController(audioUnit) {
-            log.info("success")
             await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           } else {
-            log.info("nil view countroller")
-            await send(.audioUnitCreationFailed(.nilViewController))
+            // Apple's AUv3 demo code does this when above fails.
+            let viewController = await AUGenericViewController()
+            viewController.auAudioUnit = audioUnit.auAudioUnit
+            await send(.audioUnitCreated(.init(audioUnit: audioUnit, viewController: viewController)))
           }
         } catch {
           log.info("failure - \(error.localizedDescription)")

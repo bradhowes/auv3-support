@@ -104,14 +104,6 @@ public struct PresetsFeature {
         self.userPresets = []
       }
     }
-
-    // Important to accurately define if two State entities are the same in light of two attributes being reference
-    // types. Most values in state are computed.
-    public static func == (lhs: PresetsFeature.State, rhs: PresetsFeature.State) -> Bool {
-      return (lhs.source === rhs.source &&
-              lhs.currentPresetNumber == rhs.currentPresetNumber &&
-              lhs.activePrompt == rhs.activePrompt)
-    }
   }
 
   @CasePathable

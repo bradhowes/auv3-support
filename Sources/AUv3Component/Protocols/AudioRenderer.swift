@@ -33,11 +33,17 @@ public protocol AudioRenderer: AUParameterHandler {
    */
   func bridge() -> DSPHeaders.TypeErasedKernel
 
+  /**
+   Obtain the current bypass setting of the kernel.
+
+   - returns: true when bypass is enabled
+   */
   func getBypass() -> Bool
 
+  /**
+   Change the bypass setting in the kernel.
+
+   - parameter bypass: new value
+   */
   func setBypass(_ bypass: Bool)
-
-  // func getMaxFramesToRender() -> AUAudioFrameCount
-
-  // func setMaxFramesToRender(_ maxFramesToRender: AUAudioFrameCount)
 }

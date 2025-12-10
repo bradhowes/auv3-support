@@ -2,6 +2,9 @@ import AUv3Controls
 import ComposableArchitecture
 import SwiftUI
 
+/**
+ The SwiftUI view for the audio unit controls.
+ */
 struct AUMainView: View {
   let gainStore: StoreOf<KnobFeature>
   let topKnobWidth: CGFloat = 160

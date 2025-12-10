@@ -11,21 +11,17 @@ struct EmbeddedViewController: AUv3ViewControllerRepresentable {
   let auViewController: AUv3ViewController
 
   init(auViewController: AUv3ViewController) {
-    log.info("init BEGIN - \(auViewController)")
     self.auViewController = auViewController
-    log.info("init END")
   }
 
 #if os(iOS)
 
   @MainActor
   func makeUIViewController(context: Context) -> AUv3ViewController {
-    log.info("makeUIViewController BEGIN")
-    return auViewController
+    auViewController
   }
 
   func updateUIViewController(_ viewController: AUv3ViewController, context: Context) {
-    log.info("updateUIViewController BEGIN")
   }
 
 #endif
@@ -33,15 +29,11 @@ struct EmbeddedViewController: AUv3ViewControllerRepresentable {
 #if os(macOS)
 
   func makeNSViewController(context: Context) -> AUv3ViewController {
-    log.info("makeNSViewController BEGIN")
-    return auViewController
+    auViewController
   }
 
   func updateNSViewController(_ viewController: AUv3ViewController, context: Context) {
-    log.info("updateNSViewController BEGIN")
   }
 
 #endif
 }
-
-private let log = Logger(category: "EmbeddedViewController")

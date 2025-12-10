@@ -20,10 +20,11 @@
 
  An additional base class `IntrusiveReferenceCounted` injects an atomic reference counter that Swift/C++ interop uses to
  manage the lifetime of an instance of this class. When the reference count goes to zero, the instance will be
- automatically freed. We treat the DSPKernel as a reference type in order to allow it to be created outside of the
- audio unit and passed into it during construction.
+ automatically freed. We treat the kernel as a reference type in order to allow it to be created outside of the
+ audio unit and passed into it during construction, and Swift will handle its destruction when the audio unit no longer
+ exists.
  */
-class AUv3Demo_Kernel :
+class SWIFT_SHARED_REFERENCE(_AUv3Demo_Kernel_retain, _AUv3Demo_Kernel_release) AUv3Demo_Kernel :
 public DSPHeaders::EventProcessor<AUv3Demo_Kernel>,
 public DSPHeaders::IntrusiveReferenceCounted<AUv3Demo_Kernel>
 {
@@ -37,7 +38,7 @@ public:
 
    @param name the name to use for logging inside the kernel
    */
-  SWIFT_RETURNS_UNRETAINED static AUv3Demo_Kernel* _Nonnull make(std::string name) noexcept {
+  SWIFT_RETURNS_RETAINED static AUv3Demo_Kernel* _Nonnull make(std::string name) noexcept {
     // DSPHeaders::ValidatedKernel<AUv3Demo_Kernel> _;
     return new AUv3Demo_Kernel(name);
   }
@@ -159,7 +160,7 @@ private:
   DSPHeaders::Parameters::Float gain_{AUv3Demo_ParameterAddress::gain};
 
   std::string name_;
-} SWIFT_SHARED_REFERENCE(_AUv3Demo_Kernel_retain, _AUv3Demo_Kernel_release);
+};
 
 void _AUv3Demo_Kernel_retain(AUv3Demo_Kernel* _Nonnull obj) noexcept;
 void _AUv3Demo_Kernel_release(AUv3Demo_Kernel* _Nonnull obj) noexcept;

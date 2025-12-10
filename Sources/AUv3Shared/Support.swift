@@ -18,11 +18,4 @@ public typealias AUv3ViewController = NSViewController
 public typealias AUv3HostingController = NSHostingController
 public typealias AUv3ViewControllerRepresentable = NSViewControllerRepresentable
 
-extension NSView {
-
-  public func bringSubviewToFront(_ view: NSView) {
-    // This function is a no-opp for macOS
-  }
-}
-
 #endif

@@ -8,7 +8,7 @@ import SwiftUI
 
 /**
  Generic base controller class that hosts AUv3 SwiftUI views. Delegates creation of the hosting view controller to the
- parameter factory function. Example use:
+ parameter factory function in order to reduce the amount of custom code in the . Example use:
 
  ```
  @MainActor
@@ -54,7 +54,7 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
     log.info("installAudioUnit BEGIN")
     DispatchQueue.main.async {
       log.info("setting audioUnit \(self.audioUnit)")
-      // precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
+      precondition(self.audioUnit == nil, "unexpectedly re-installing audioUnit property")
       self.audioUnit = audioUnit
     }
     log.info("installAudioUnit BEGIN")
@@ -96,7 +96,13 @@ open class AudioUnitViewControllerBase<HCF: HostingControllerFactory>: AUViewCon
     host.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
     host.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
     host.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+
+#if os(iOS)
+    host.view.backgroundColor = .clear
+    self.view.backgroundColor = .black
     self.view.bringSubviewToFront(host.view)
+#endif // os(iOS)
+
 
     log.info("configureSwiftUIView END")
   }

@@ -4,7 +4,7 @@ import SwiftUI
 
 
 /**
- Protocol for a factory of AUv3HostingController instances
+ Protocol for a factory of AUv3HostingController instances.
  */
 @MainActor
 public protocol HostingControllerFactory {
