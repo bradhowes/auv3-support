@@ -29,7 +29,7 @@ The demo app essentially replicates what is available in Xcode when you ask it t
 "Audio Unit Extension App" template. The app serves as a simple AUv3 host to play audio samples through the AUv3 effect which is 
 just a simple gain control. There is a circular knob that controls the gain of the effect. The knob comes from my 
 [AUv3Controls][ac] package, and it is served from the AUv3 
-component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift). See the [README](AUv3Demo) for more info.
+component's [SwiftUI view](AUv3Demo/AUv3DemoExtension/UI/AUMainView.swift). See the [README](AUv3Demo/README.md) for more info.
 
 <img src="media/AUv3Demo.png" width="300">
 
