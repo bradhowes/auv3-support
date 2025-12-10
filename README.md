@@ -49,7 +49,7 @@ For comparison, below is the view of the same app running on macOS:
 
 <img src="media/AUv3Demo_macOS.png" width="400">
 
-The macOS app also offers menus:
+The macOS app also has custom menus in the menubar, dynamically created as presets change:
 
 <img src="media/Menu_macOS.png">
 

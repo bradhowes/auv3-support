@@ -224,12 +224,14 @@ public struct HostView: View {
 public struct HostScene: Scene {
   @Bindable private var store: StoreOf<HostFeature>
   private let config: HostConfig
-  
+  private let checkmark = Image(systemName: "checkmark")
+  private let clearmark = Image.filledRect(size: .init(width: 20, height: 20))
+
   public init(store: StoreOf<HostFeature>, config: HostConfig) {
     self.store = store
     self.config = config
   }
-  
+
   public var body: some Scene {
     WindowGroup {
       HostView(store: store)
@@ -255,20 +257,19 @@ public struct HostScene: Scene {
         CommandMenu("Presets") {
           Button("New Preset") { store.send(.newButtonTapped) }
             .disabled(store.showNotice)
-          Button("Rename") { store.send(.renameButtonTapped) }
-            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
-          Button("Update") { store.send(.updateButtonTapped) }
-            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
-          Button("Delete") { store.send(.deleteButtonTapped) }
-            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
+          commandMenuItem(name: "Rename", action: .renameButtonTapped)
+          commandMenuItem(name: "Update", action: .updateButtonTapped)
+          commandMenuItem(name: "Delete", action: .deleteButtonTapped)
+
           if !store.presets.userPresets.isEmpty {
             Section("User") {
-              ForEach(store.presets.userPresetsOrderedByName, id: \.number) { presetButton(preset: $0) }
+              ForEach(store.presets.userPresetsOrderedByName, id: \.number) { presetMenuItem(preset: $0) }
             }
           }
+
           if !store.presets.factoryPresets.isEmpty {
             Section("Factory") {
-              ForEach(store.presets.factoryPresetsOrderedByName, id: \.number) { presetButton(preset: $0) }
+              ForEach(store.presets.factoryPresetsOrderedByName, id: \.number) { presetMenuItem(preset: $0) }
             }
           }
         }
@@ -276,12 +277,18 @@ public struct HostScene: Scene {
     }
   }
 
-  private func presetButton(preset: AUAudioUnitPreset) -> some View {
-    Button {
-      store.send(.presetButtonTapped(preset.number))
-    } label: {
+  private func commandMenuItem(name: String, action: HostFeature.Action) -> some View {
+    Button(name) { store.send(action) }
+      .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
+  }
+
+  private func presetMenuItem(preset: AUAudioUnitPreset) -> some View {
+    Toggle(isOn: Binding(
+      get: { preset.number == store.presets.currentPresetNumber },
+      set: { _ in store.send(.presetButtonTapped(preset.number)) }
+    ), label: {
       Text(preset.name)
-    }
+    })
     .disabled(store.showNotice)
   }
 }
