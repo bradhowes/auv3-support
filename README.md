@@ -47,7 +47,7 @@ touched, the default behavior is to show the App Store entry for the AUv3 compon
 
 For comparison, below is the view of the same app running on macOS:
 
-<img src="media/AUv3Demo_macOS.png width="400">
+<img src="media/AUv3Demo_macOS.png" width="400">
 
 ## History
 
