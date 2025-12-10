@@ -286,18 +286,17 @@ public struct PresetsMenu: View {
   }
 
   public var body: some View {
+    Group {
 #if os(iOS)
-    Menu {
-      presetPicker
-        .menuActionDismissBehavior(.enabled)
-      commands
-    } label: {
+      pickerMenu
+#endif // os(iOS)
+#if os(macOS) || os(iPadOS)
       Text(store.currentPresetName)
         .tint(themeLabelColor)
         .font(.callout)
         .lineLimit(1)
+#endif // os(macOS) || os(iPadOS)
     }
-    .disabled(!store.hasPresets)
     .alert(
       "Preset Name",
       isPresented: Binding(
@@ -321,13 +320,20 @@ public struct PresetsMenu: View {
       }
       .disabled(store.activePrompt.name.isEmpty)
     }
-#endif // os(iOS)
-#if os(macOS)
-    Text(store.currentPresetName)
-      .tint(themeLabelColor)
-      .font(.callout)
-      .lineLimit(1)
-#endif // os(macOS)
+  }
+
+  private var pickerMenu: some View {
+    Menu {
+      presetPicker
+        .menuActionDismissBehavior(.enabled)
+      commands
+    } label: {
+      Text(store.currentPresetName)
+        .tint(themeLabelColor)
+        .font(.callout)
+        .lineLimit(1)
+    }
+    .disabled(!store.hasPresets)
   }
 
   private var commands: some View {
@@ -340,7 +346,7 @@ public struct PresetsMenu: View {
     }
   }
 
-  private var userCommands: some View {
+  public var userCommands: some View {
     VStack {
       Button { store.send(.newButtonTapped) } label: { Text("New Preset") }
       Button { store.send(.renameButtonTapped) } label: { Text("Rename") }

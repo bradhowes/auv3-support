@@ -53,10 +53,17 @@ public struct HostFeature {
   }
 
   public enum Action {
+    case bypassButtonTapped
+    case deleteButtonTapped
     case dismissNotice
     case engine(EngineFeature.Action)
     case loader(AudioUnitLoaderFeature.Action)
+    case newButtonTapped
+    case playButtonTapped
+    case presetButtonTapped(Int)
     case presets(PresetsFeature.Action)
+    case renameButtonTapped
+    case updateButtonTapped
     case versionButtonTapped
   }
 
@@ -67,6 +74,8 @@ public struct HostFeature {
 
     Reduce { state, action in
       switch action {
+      case .bypassButtonTapped: return reduce(into: &state, action: .engine(.bypassButtonTapped))
+      case .deleteButtonTapped: return reduce(into: &state, action: .presets(.deleteButtonTapped))
       case .dismissNotice:
         state.showNotice = false
         state.failureError = nil
@@ -75,7 +84,12 @@ public struct HostFeature {
       case let .loader(.delegate(.found(success))): return loaderFoundComponent(&state, payload: success)
       case let .loader(.delegate(.failed(error))): return loaderFailed(&state, error: error)
       case .loader: return .none
+      case .newButtonTapped: return reduce(into: &state, action: .presets(.newButtonTapped))
+      case .playButtonTapped: return reduce(into: &state, action: .engine(.playButtonTapped))
+      case .presetButtonTapped(let number): return reduce(into: &state, action: .presets(.presetNumberSelected(number)))
       case .presets: return .none
+      case .renameButtonTapped: return reduce(into: &state, action: .presets(.renameButtonTapped))
+      case .updateButtonTapped: return reduce(into: &state, action: .presets(.updateButtonTapped))
       case .versionButtonTapped: return visitAppStore(&state)
       }
     }
@@ -177,6 +191,7 @@ public struct HostView: View {
 #if os(iOS)
     .ignoresSafeArea(.keyboard)
 #endif
+    .focusedSceneValue(store)
   }
 
   var spacer: some View {
@@ -203,6 +218,71 @@ public struct HostView: View {
       }
       spacer
     }
+  }
+}
+
+public struct HostScene: Scene {
+  @Bindable private var store: StoreOf<HostFeature>
+  private let config: HostConfig
+  
+  public init(store: StoreOf<HostFeature>, config: HostConfig) {
+    self.store = store
+    self.config = config
+  }
+  
+  public var body: some Scene {
+    WindowGroup {
+      HostView(store: store)
+        .padding(.top, 16)
+        .accentColor(config.themeLabelColor)
+        .environment(\.themeControlColor, config.themeControlColor)
+        .environment(\.themeLabelColor, config.themeLabelColor)
+    }
+    .commands {
+      CommandMenu("Actions") {
+        Button(store.engine.isPlaying ? "Stop" : "Play", systemImage: store.engine.playButtonImageName) {
+          store.send(.playButtonTapped)
+        }
+        .keyboardShortcut("P")
+        .disabled(store.showNotice)
+        Button("Bypass", systemImage: store.engine.bypassButtonImageName) {
+          store.send(.bypassButtonTapped)
+        }
+        .keyboardShortcut("B")
+        .disabled(!store.engine.isPlaying)
+      }
+      if store.presets.hasPresets {
+        CommandMenu("Presets") {
+          Button("New Preset") { store.send(.newButtonTapped) }
+            .disabled(store.showNotice)
+          Button("Rename") { store.send(.renameButtonTapped) }
+            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
+          Button("Update") { store.send(.updateButtonTapped) }
+            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
+          Button("Delete") { store.send(.deleteButtonTapped) }
+            .disabled(store.showNotice || store.presets.currentPresetNumber >= 0)
+          if !store.presets.userPresets.isEmpty {
+            Section("User") {
+              ForEach(store.presets.userPresetsOrderedByName, id: \.number) { presetButton(preset: $0) }
+            }
+          }
+          if !store.presets.factoryPresets.isEmpty {
+            Section("Factory") {
+              ForEach(store.presets.factoryPresetsOrderedByName, id: \.number) { presetButton(preset: $0) }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private func presetButton(preset: AUAudioUnitPreset) -> some View {
+    Button {
+      store.send(.presetButtonTapped(preset.number))
+    } label: {
+      Text(preset.name)
+    }
+    .disabled(store.showNotice)
   }
 }
 
