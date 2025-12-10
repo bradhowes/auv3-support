@@ -45,6 +45,10 @@ values, rename them, and delete them.
 The last control is at the lower-right of the screen showing the version of the AUv3 application extension. When
 touched, the default behavior is to show the App Store entry for the AUv3 component.
 
+For comparison, below is the view of the same app running on macOS:
+
+<img src="media/AUv3Demo_macOS.png width="400">
+
 ## History
 
 This is an update of my [AUv3Support][old] package which used UIKit and AppKit and included the DSPHeaders package. This
