@@ -221,13 +221,16 @@ public struct HostView: View {
   }
 }
 
+/**
+ Custom scene for the host app that provides for menu actions when on macOS and iPadOS platforms.
+ */
 public struct HostScene: Scene {
   @Bindable private var store: StoreOf<HostFeature>
   private let config: HostConfig
   private let checkmark = Image(systemName: "checkmark")
   private let clearmark = Image.filledRect(size: .init(width: 20, height: 20))
 
-  public init(store: StoreOf<HostFeature>, config: HostConfig) {
+  public init(config: HostConfig, store: StoreOf<HostFeature>) {
     self.store = store
     self.config = config
   }

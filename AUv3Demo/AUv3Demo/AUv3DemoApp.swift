@@ -28,8 +28,7 @@ struct AUv3DemoApp: App {
   )
 
   var body: some Scene {
-    HostScene(store: StoreOf<HostFeature>(initialState: .init(config: config)) { HostFeature() },
-              config: config)
+    HostScene(config: config, store: StoreOf<HostFeature>(initialState: .init(config: config)) { HostFeature() })
   }
 }
 
