@@ -15,7 +15,7 @@ All AUv3 appex components have a unique combination of three values:
 
 These values are stored in the [Config.xcconfig](Config.xcconfig) file and are injected into the Info.plist files for
 both the app and the app extension automatically by the build process. They are also available in code by by accessing
-the right `Bundle` -- see the [Bundle extensions](../Sources/AUv3Shared/Bundle.swift) for details.
+the right `Bundle` -- see the [Bundle extensions](../Sources/AUv3Shared/Extensions/Bundle.swift) for details.
 
 # Host App
 
@@ -137,8 +137,8 @@ struct ViewControllerFactory: HostingControllerFactory {
 
 ## DSP Kernel
 
-The actual audio sample processing rendering happens in the [AUv3Demo_Kernel](AUv3DemoExtension/Kernel/AUv3Demo_Kernel.hpp), in 
-particular its `doRendering` method:
+The actual audio sample processing rendering happens in the [AUv3Demo_Kernel](AUv3DemoExtension/Kernel/AUv3Demo_Kernel.hpp#L103), 
+in particular its `doRendering` method:
 
 ```c++
   void doRendering(DSPHeaders::BusBuffers ins, DSPHeaders::BusBuffers outs, AUAudioFrameCount frameCount) noexcept {

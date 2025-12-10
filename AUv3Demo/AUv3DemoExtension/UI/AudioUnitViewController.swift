@@ -6,7 +6,7 @@ import os
 import SwiftUI
 
 /**
- Custom factory for creating the AUv3 SwifUI view for the audio unit kernel.
+ Custom factory for creating the AUv3 SwifUI view for the audio unit kernel.
  */
 @MainActor
 struct ViewControllerFactory: HostingControllerFactory {
