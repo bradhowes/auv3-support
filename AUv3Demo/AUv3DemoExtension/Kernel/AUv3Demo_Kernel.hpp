@@ -100,7 +100,7 @@ public:
   /**
    Entry point for rendering processing of this kernel.
    */
-  void doRendering(DSPHeaders::BusBuffers ins, DSPHeaders::BusBuffers outs, AUAudioFrameCount frameCount) noexcept {
+  void doRendering(NSInteger, DSPHeaders::BusBuffers ins, DSPHeaders::BusBuffers outs, AUAudioFrameCount frameCount) noexcept {
     auto gain = gain_.frameValue();
     for (auto channelIndex = 0; channelIndex < ins.size(); ++channelIndex) {
       auto in = ins[channelIndex];
