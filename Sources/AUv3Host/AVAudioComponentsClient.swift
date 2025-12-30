@@ -46,10 +46,3 @@ extension AVAudioComponentsClient {
 }
 
 extension AVAudioComponentsClient: DependencyKey {}
-
-extension DependencyValues {
-  var avAudioComponentsClient: AVAudioComponentsClient {
-    get { self[AVAudioComponentsClient.self] }
-    set { self[AVAudioComponentsClient.self] = newValue }
-  }
-}

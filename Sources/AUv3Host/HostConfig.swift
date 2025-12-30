@@ -5,6 +5,14 @@ import SwiftUI
 
 /**
  Defines the AUv3 component to host and various display characteristics of the host app.
+
+ The required items in the `HostConfig` constructor are:
+
+ - name -- the name of the audio unit to display in the app
+ - version -- the version of the audio unit that is being shown
+ - appStoreId -- the app store ID assigned by Apple's App Store
+ - componentDescription -- the unique identifier for the AUv3 component that is to be loaded
+ - sampleLoop -- the enum identifying the resource to play
  */
 public struct HostConfig {
 
@@ -75,17 +83,3 @@ host applications.
   }
 }
 
-public extension EnvironmentValues {
-  @Entry var themeControlColor: Color = .red
-  @Entry var themeLabelColor: Color = .red
-}
-
-public extension View {
-  func themeControlColor(_ color: Color) -> some View {
-    environment(\.themeControlColor, color)
-  }
-
-  func themeLabelColor(_ color: Color) -> some View {
-    environment(\.themeLabelColor, color)
-  }
-}

@@ -1,20 +1,28 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
 import OSLog
+import os
 
 private class BundleTag {}
 
+/**
+ A light-weight wrapper around `os.Logger`.
+ */
 public struct Logger: Sendable {
 
   /// The top-level identifier for the app.
   public static let subsystem = Bundle(for: BundleTag.self).bundleIdentifier?.lowercased() ?? "?"
-
   public let category: String
   public let logger: os.Logger
 
   public init(category: String) {
     self.category = category
     self.logger = os.Logger(subsystem: Self.subsystem, category: category)
+  }
+
+  public init(subsystem: String, category: String) {
+    self.category = category
+    self.logger = os.Logger(subsystem: subsystem, category: category)
   }
 
 #if DEBUG

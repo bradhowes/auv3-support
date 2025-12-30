@@ -7,7 +7,7 @@ public extension AUParameterTree {
   /**
    Access parameter in tree via ParameterAddressProvider (eg enum).
 
-   - parameter address: the address to fetch
+   - parameter source: entity containing the address to fetch
    - returns: the found value
    */
   @inlinable

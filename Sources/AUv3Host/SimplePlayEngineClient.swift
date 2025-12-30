@@ -58,11 +58,3 @@ extension SimplePlayEngineClient {
 }
 
 extension SimplePlayEngineClient: DependencyKey {}
-
-extension DependencyValues {
-  var simplePlayEngine: SimplePlayEngineClient {
-    get { self[SimplePlayEngineClient.self] }
-    set { self[SimplePlayEngineClient.self] = newValue }
-  }
-}
-

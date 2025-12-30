@@ -7,10 +7,6 @@ import Dependencies
 import SwiftUI
 import SwiftNavigation
 
-public extension EnvironmentValues {
-  @Entry var tintColor: Color = .blue
-}
-
 /**
  Feature that acts as an AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription`
  attribute found in a `HostConfig` instance. Once loaded, it is wired into an audio processing graph so that it will receive

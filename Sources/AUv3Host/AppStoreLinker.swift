@@ -35,11 +35,4 @@ extension AppStoreLinker {
 
 extension AppStoreLinker: DependencyKey {}
 
-extension DependencyValues {
-  public var appStoreLinker: AppStoreLinker {
-    get { self[AppStoreLinker.self] }
-    set { self[AppStoreLinker.self] = newValue }
-  }
-}
-
 #endif
