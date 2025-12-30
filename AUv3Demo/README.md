@@ -86,7 +86,7 @@ struct AUMainView: View {
           .frame(maxWidth: topKnobWidth)
           .preferredColorScheme(.dark)
       }
-      .knobNativeValueEditorHost()
+      .knobValueEditorHost()
     }
     .environment(\.colorScheme, .dark)
   }

@@ -7,23 +7,21 @@ import SwiftUI
  */
 struct AUMainView: View {
   let gainStore: StoreOf<KnobFeature>
-  let topKnobWidth: CGFloat = 160
+  let knobWidth: CGFloat = 160
+  @Environment(\.colorScheme) var colorScheme
 
   init(gain: AUParameter) {
-    self.gainStore = Store(initialState: KnobFeature.State(parameter: gain)) {
-      KnobFeature(parameter: gain)
-    }
+    self.gainStore = Store(initialState: KnobFeature.State(parameter: gain)) { KnobFeature() }
   }
 
   var body: some View {
     Group {
       VStack {
         KnobView(store: gainStore)
-          .frame(maxWidth: topKnobWidth)
-          .preferredColorScheme(.dark)
+          .frame(maxWidth: knobWidth)
       }
-      .knobNativeValueEditorHost()
+      .knobValueEditor()
+      .auv3ControlsTheme(Theme(colorScheme: colorScheme))
     }
-    .environment(\.colorScheme, .dark)
   }
 }
