@@ -22,7 +22,7 @@ Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][d
 [EventProcessor][ep] template class that provides a complete foundation for a C++ DSP kernel that can be used in Swift and
 put in [AudioUnitAdapter][aua] container.
 
-Some of the components use [The Composable Architecture (TCA)[tca] for Swift by the [Point-Free][pf] team to structure
+Some of the components use [The Composable Architecture (TCA)][tca] for Swift by the [Point-Free][pf] team to structure
 the components into features that are composable and well-tested.
 
 # Demo App
