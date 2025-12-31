@@ -22,6 +22,9 @@ Additional AUv3 functionality specific to C++ can be found in the [DSPHeaders][d
 [EventProcessor][ep] template class that provides a complete foundation for a C++ DSP kernel that can be used in Swift and
 put in [AudioUnitAdapter][aua] container.
 
+Some of the components use [The Composable Architecture (TCA)[tca] for Swift by the [Point-Free][pf] team to structure
+the components into features that are composable and well-tested.
+
 # Demo App
 
 There is a [demo app](AUv3Demo) that illustrates how to use the [AUv3Host][h] and [AUv3Component][c] modules. 
@@ -82,3 +85,5 @@ Otherwise, the functionality remains pretty much the same between the two packag
 [spip]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbradhowes%2Fauv3-support%2Fbadge%3Ftype%3Dplatforms
 [mit]: https://img.shields.io/badge/License-MIT-A31F34.svg
 [license]: https://opensource.org/licenses/MIT
+[tca]: https://github.com/pointfreeco/swift-composable-architecture
+[pf]: https://www.pointfree.co
