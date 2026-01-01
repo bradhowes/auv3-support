@@ -116,9 +116,14 @@ extension AudioUnitAdapter {
 
 extension AudioUnitAdapter {
 
-  /// Valid combinations of input and output channel counts. Support any number of channels, as long as input and
-  /// output counts match.
-  public override var channelCapabilities: [NSNumber] { [NSNumber(value: -1), NSNumber(value: -1)] }
+  /// Publish the support number of input/output channel combinations. Make sure that those listed are actually supported, and
+  /// verify using `auval` tool.
+  public override var channelCapabilities: [NSNumber] {
+    [
+      NSNumber(value: 1), NSNumber(value: 1),
+      NSNumber(value: 2), NSNumber(value: 2)
+    ]
+  }
 
   /// The input busses supported by the component. We only support one.
   override public var inputBusses: AUAudioUnitBusArray { _inputBusses }

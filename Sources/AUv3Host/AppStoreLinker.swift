@@ -3,19 +3,8 @@
 import Dependencies
 import Foundation
 
-#if os(iOS)
-
-import UIKit
-
 public struct AppStoreLinker: @unchecked Sendable {
   public var visit: (String) async -> Void
-}
-
-private func visitStore(site: String) async {
-  if let url = URL(string: site),
-     await UIApplication.shared.canOpenURL(url) {
-    await UIApplication.shared.open(url, options: [:], completionHandler: { _ in })
-  }
 }
 
 extension AppStoreLinker {
@@ -35,4 +24,27 @@ extension AppStoreLinker {
 
 extension AppStoreLinker: DependencyKey {}
 
+#if os(iOS)
+
+import UIKit
+
+private func visitStore(site: String) async {
+  if let url = URL(string: site),
+     await UIApplication.shared.canOpenURL(url) {
+    await UIApplication.shared.open(url, options: [:], completionHandler: { _ in })
+  }
+}
+
 #endif
+
+#if os(macOS)
+
+import AppKit
+
+private func visitStore(site: String) async {
+  if let url = URL(string: site) {
+    NSWorkspace.shared.open(url)
+  }
+}
+
+#endif // os(macOS)
