@@ -464,7 +464,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AUv3DemoExtension/AUv3DemoExtension-Bridging-Header.hpp";
-				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
@@ -518,7 +518,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AUv3DemoExtension/AUv3DemoExtension-Bridging-Header.hpp";
-				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
@@ -951,7 +951,7 @@
 			repositoryURL = "https://github.com/bradhowes/AUv3Controls";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.2;
+				minimumVersion = 0.27.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/bradhowes/AUv3Controls",
       "state" : {
-        "revision" : "66720b1004f64a062318e136ff4b7bac9b233c27",
-        "version" : "1.0.2"
+        "revision" : "e67ded7e513f4820ab40ae9244f228a28709fc1c",
+        "version" : "0.27.0"
       }
     },
     {
