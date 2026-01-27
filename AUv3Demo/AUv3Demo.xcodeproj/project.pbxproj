@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BD13FCC12F291BEE00DB947F /* AUv3Controls in Frameworks */ = {isa = PBXBuildFile; productRef = BD13FCC02F291BEE00DB947F /* AUv3Controls */; };
 		BDD002C42E364C0900E9AABC /* AUv3Host in Frameworks */ = {isa = PBXBuildFile; productRef = BDD002C32E364C0900E9AABC /* AUv3Host */; };
 		BDF599B62E284D640093A134 /* AUv3DemoExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BDF599B52E284D640093A134 /* AUv3DemoExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BDF599F62E284DE60093A134 /* AUv3Component in Frameworks */ = {isa = PBXBuildFile; productRef = BDF599F52E284DE60093A134 /* AUv3Component */; };
@@ -14,7 +15,6 @@
 		BDF59A102E2850430093A134 /* AUv3Component in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A0F2E2850430093A134 /* AUv3Component */; };
 		BDF59A122E2850430093A134 /* AUv3Shared in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A112E2850430093A134 /* AUv3Shared */; };
 		BDF59A162E2852430093A134 /* AUv3Controls in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A152E2852430093A134 /* AUv3Controls */; };
-		BDF59A192E2852720093A134 /* AUv3Controls in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59A182E2852720093A134 /* AUv3Controls */; };
 		BDF59AE62E2990DD0093A134 /* DSPHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = BDF59AE52E2990DD0093A134 /* DSPHeaders */; };
 /* End PBXBuildFile section */
 
@@ -118,6 +118,7 @@
 				BDF599F62E284DE60093A134 /* AUv3Component in Frameworks */,
 				BDD002C42E364C0900E9AABC /* AUv3Host in Frameworks */,
 				BDF599FA2E284DE60093A134 /* AUv3Shared in Frameworks */,
+				BD13FCC12F291BEE00DB947F /* AUv3Controls in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,7 +144,6 @@
 				BDF59A122E2850430093A134 /* AUv3Shared in Frameworks */,
 				BDF59A162E2852430093A134 /* AUv3Controls in Frameworks */,
 				BDF59AE62E2990DD0093A134 /* DSPHeaders in Frameworks */,
-				BDF59A192E2852720093A134 /* AUv3Controls in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +206,7 @@
 				BDF599F52E284DE60093A134 /* AUv3Component */,
 				BDF599F92E284DE60093A134 /* AUv3Shared */,
 				BDD002C32E364C0900E9AABC /* AUv3Host */,
+				BD13FCC02F291BEE00DB947F /* AUv3Controls */,
 			);
 			productName = AUv3Demo;
 			productReference = BDF599792E284D630093A134 /* AUv3Demo.app */;
@@ -277,7 +278,6 @@
 				BDF59A0F2E2850430093A134 /* AUv3Component */,
 				BDF59A112E2850430093A134 /* AUv3Shared */,
 				BDF59A152E2852430093A134 /* AUv3Controls */,
-				BDF59A182E2852720093A134 /* AUv3Controls */,
 				BDF59AE52E2990DD0093A134 /* DSPHeaders */,
 			);
 			productName = AUv3DemoExtension;
@@ -321,7 +321,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BDF599F32E284DD30093A134 /* XCLocalSwiftPackageReference "../../auv3-support" */,
-				BDF59A172E2852720093A134 /* XCRemoteSwiftPackageReference "AUv3Controls" */,
+				BD13FCBF2F291BEE00DB947F /* XCRemoteSwiftPackageReference "AUv3Controls" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BDF5997A2E284D630093A134 /* Products */;
@@ -946,17 +946,22 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		BDF59A172E2852720093A134 /* XCRemoteSwiftPackageReference "AUv3Controls" */ = {
+		BD13FCBF2F291BEE00DB947F /* XCRemoteSwiftPackageReference "AUv3Controls" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bradhowes/AUv3Controls";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.25.8;
+				minimumVersion = 1.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BD13FCC02F291BEE00DB947F /* AUv3Controls */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD13FCBF2F291BEE00DB947F /* XCRemoteSwiftPackageReference "AUv3Controls" */;
+			productName = AUv3Controls;
+		};
 		BDD002C32E364C0900E9AABC /* AUv3Host */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BDF599F32E284DD30093A134 /* XCLocalSwiftPackageReference "../../auv3-support" */;
@@ -984,11 +989,6 @@
 		};
 		BDF59A152E2852430093A134 /* AUv3Controls */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = AUv3Controls;
-		};
-		BDF59A182E2852720093A134 /* AUv3Controls */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BDF59A172E2852720093A134 /* XCRemoteSwiftPackageReference "AUv3Controls" */;
 			productName = AUv3Controls;
 		};
 		BDF59AE52E2990DD0093A134 /* DSPHeaders */ = {
