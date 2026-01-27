@@ -30,11 +30,17 @@ let package = Package(
       resources: [.process("Resources")],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
-        .interoperabilityMode(.Cxx)
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
       ]
     ),
     .target(
-      name: "AUv3Shared"
+      name: "AUv3Shared",
+      swiftSettings: [
+        .define("APPLICATION_EXTENSION_API_ONLY"),
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "AUv3Component",
@@ -44,7 +50,8 @@ let package = Package(
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
-        .interoperabilityMode(.Cxx)
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
       ]
     ),
     .testTarget(
@@ -55,7 +62,8 @@ let package = Package(
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
-        .interoperabilityMode(.Cxx)
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
       ]
     ),
     .testTarget(
@@ -67,7 +75,8 @@ let package = Package(
       resources: [.process("Resources")],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
-        .interoperabilityMode(.Cxx)
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
       ]
     ),
     .testTarget(
@@ -79,9 +88,11 @@ let package = Package(
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),
-        .interoperabilityMode(.Cxx)
+        .interoperabilityMode(.Cxx),
+        .enableUpcomingFeature("StrictConcurrency")
       ]
     ),
   ],
+  swiftLanguageModes: [.v6],
   cxxLanguageStandard: .cxx2b
 )
