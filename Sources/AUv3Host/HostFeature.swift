@@ -8,10 +8,10 @@ import SwiftUI
 import SwiftNavigation
 
 /**
- Feature that acts as an AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription`
- attribute found in a `HostConfig` instance. Once loaded, it is wired into an audio processing graph so that it will receive
- pre-recorded samples from an audio file and its rendered samples will go to the device's main speakers. Most of the work is done
- by child features.
+ Feature that acts as a very basic AUv3 host. It attempts to load a specific AUv3 instance defined by the `AudioComponentDescription`
+ attribute found in a `HostConfig` instance. Once loaded, it wire the AUv3 component into an audio processing graph so that it will
+ receive pre-recorded samples from an audio file and its rendered samples will go to the device's main speakers.
+ Most of the work is done by child features.
  */
 @Reducer
 public struct HostFeature {
@@ -72,13 +72,10 @@ public struct HostFeature {
       switch action {
       case .bypassButtonTapped: return reduce(into: &state, action: .engine(.bypassButtonTapped))
       case .deleteButtonTapped: return reduce(into: &state, action: .presets(.deleteButtonTapped))
-      case .dismissNotice:
-        state.showNotice = false
-        state.failureError = nil
-        return .none.animation()
+      case .dismissNotice: return dismissNotice(&state)
       case .engine: return .none
-      case let .loader(.delegate(.found(success))): return loaderFoundComponent(&state, payload: success)
-      case let .loader(.delegate(.failed(error))): return loaderFailed(&state, error: error)
+      case .loader(.delegate(.failed(let error))): return loaderFailed(&state, error: error)
+      case .loader(.delegate(.found(let success))): return loaderFoundComponent(&state, payload: success)
       case .loader: return .none
       case .newButtonTapped: return reduce(into: &state, action: .presets(.newButtonTapped))
       case .playButtonTapped: return reduce(into: &state, action: .engine(.playButtonTapped))
@@ -92,6 +89,34 @@ public struct HostFeature {
   }
 
   public init() {}
+}
+
+extension HostFeature {
+
+  private func dismissNotice(_ state: inout State) -> Effect<Action> {
+    state.showNotice = false
+    state.failureError = nil
+    return .none.animation()
+  }
+
+  private func loaderFailed(_ state: inout State, error: AudioUnitLoaderError) -> Effect<Action> {
+    state.failureError = error.description
+    return .none
+  }
+
+  private func loaderFoundComponent(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
+    state.audioUnit = payload.audioUnit
+    state.auViewController = payload.viewController
+
+    if state.initialNotice != nil {
+      state.showNotice = true
+    }
+
+    return .merge(
+      reduce(into: &state, action: .engine(.connectEffect(payload.audioUnit, state.sampleLoop))),
+      reduce(into: &state, action: .presets(.setSource(payload.audioUnit.auAudioUnit)))
+    )
+  }
 
   private func visitAppStore(_ state: inout State) -> Effect<Action> {
 #if os(iOS)
@@ -104,25 +129,6 @@ public struct HostFeature {
     // TODO: handle visit on macOS
     return .none
 #endif
-  }
-
-  private func loaderFoundComponent(_ state: inout State, payload: AudioUnitLoaderSuccess) -> Effect<Action> {
-    state.audioUnit = payload.audioUnit
-    state.auViewController = payload.viewController
-
-    if state.initialNotice != nil {
-      state.showNotice = true
-    }
-
-    return .concatenate(
-      reduce(into: &state, action: .engine(.connectEffect(payload.audioUnit, state.sampleLoop))),
-      reduce(into: &state, action: .presets(.setSource(payload.audioUnit.auAudioUnit))),
-    )
-  }
-
-  private func loaderFailed(_ state: inout State, error: AudioUnitLoaderError) -> Effect<Action> {
-    state.failureError = error.description
-    return .none
   }
 }
 

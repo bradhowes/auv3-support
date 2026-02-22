@@ -10,25 +10,33 @@ struct AUv3DemoApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 #endif
 
-  let config = HostConfig(
-    name: Bundle.main.auComponentName,
-    version: Bundle.main.versionTag,
-    appStoreId: Bundle.main.appStoreId,
-    componentDescription: .init(
-      componentType: Bundle.main.auComponentType,
-      componentSubType: Bundle.main.auComponentSubtype,
-      componentManufacturer: Bundle.main.auComponentManufacturer,
-      componentFlags: 0,
-      componentFlagsMask: 0
-    ),
-    sampleLoop: .sample1,
-    appStoreVisitor: { _ in },
-    maxWait: .seconds(15),
-    alwaysShowNotice: true
-  )
+  let config: HostConfig
+  let store: StoreOf<HostFeature>
+
+  init() {
+    let config = HostConfig(
+      name: Bundle.main.auComponentName,
+      version: Bundle.main.versionTag,
+      appStoreId: Bundle.main.appStoreId,
+      componentDescription: .init(
+        componentType: Bundle.main.auComponentType,
+        componentSubType: Bundle.main.auComponentSubtype,
+        componentManufacturer: Bundle.main.auComponentManufacturer,
+        componentFlags: 0,
+        componentFlagsMask: 0
+      ),
+      sampleLoop: .sample1,
+      appStoreVisitor: { _ in },
+      maxWait: .seconds(15),
+      alwaysShowNotice: true
+    )
+
+    self.config = config
+    self.store = StoreOf<HostFeature>(initialState: .init(config: config)) { HostFeature() }
+  }
 
   var body: some Scene {
-    HostScene(config: config, store: StoreOf<HostFeature>(initialState: .init(config: config)) { HostFeature() })
+    HostScene(config: config, store: store)
   }
 }
 

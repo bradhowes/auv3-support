@@ -195,7 +195,7 @@ fileprivate class PresetsFeatureTests {
     }
 
     _ = await sut.withExhaustivity(.off(showSkippedAssertions: false)) {
-      await sut.send(.doNew) {
+      await sut.send(.newPresetRequested) {
         $0.activePrompt = .init(prompt: .none, name: "")
         $0.currentPresetNumber = -2
         $0.currentPresetName = "New Foo"
@@ -236,7 +236,7 @@ fileprivate class PresetsFeatureTests {
     print(sut.state.userPresets)
 
     _ = await sut.withExhaustivity(.off(showSkippedAssertions: false)) {
-      await sut.send(.doRename) {
+      await sut.send(.renamePresetRequested) {
         $0.activePrompt = .init(prompt: .none, name: "")
         $0.currentPresetName = "Renamed"
       }
@@ -347,11 +347,11 @@ fileprivate class PresetsFeatureTests {
 
     facade.currentPreset = .init(number: 3, name: "Boom")
 
-    await sut.receive(\.updateForCurrentPresetChange, 3)
+    await sut.receive(\.currentPresetChanged, 3)
 
     facade.currentPreset = nil
 
-    await sut.receive(\.updateForCurrentPresetChange, nil)
+    await sut.receive(\.currentPresetChanged, nil)
 
     await sut.send(.stopMonitoringCurrentPresetChange)
   }

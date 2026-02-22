@@ -2,6 +2,7 @@
 
 import os.log
 import AUv3Component
+import AUv3Shared
 @preconcurrency import AVFoundation
 import ComposableArchitecture
 import BRHSegmentedControl
@@ -107,10 +108,11 @@ public struct PresetsFeature {
   }
 
   @CasePathable
-  public enum Action {
+  public enum Action: Sendable {
+    case currentPresetChanged(Int?)
     case deleteButtonTapped
-    case doNew
-    case doRename
+    case newPresetRequested
+    case renamePresetRequested
     case factoryPresetPicked(Int)
     case newButtonTapped
     case presetNumberSelected(Int)
@@ -119,76 +121,50 @@ public struct PresetsFeature {
     case renameButtonTapped
     case setSource(AUAudioUnit)
     case stopMonitoringCurrentPresetChange
-    case updateForCurrentPresetChange(Int?)
     case updateButtonTapped
   }
 
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .currentPresetChanged(let preset): return currentPresetChanged(&state, preset: preset)
       case .deleteButtonTapped: return deleteButtonTapped(&state)
       case .promptCancelButtonTapped: return promptCancelButtonTapped(&state)
-      case .doNew: return doNew(&state)
-      case .doRename: return doRename(&state)
       case .factoryPresetPicked(let index): return factoryPresetPicked(&state, index: index)
       case .newButtonTapped: return newButtonTapped(&state)
+      case .newPresetRequested: return newPresetRequested(&state)
       case .presetNumberSelected(let number): return presetNumberSelected(&state, number: number)
       case .promptTextChanged(let value): return promptTextChanged(&state, value: value)
-      case .renameButtonTapped: return renameTapped(&state)
+      case .renameButtonTapped: return renameButtonTapped(&state)
+      case .renamePresetRequested: return renamePresetRequested(&state)
       case .setSource(let source): return setSource(&state, source: source)
       case .stopMonitoringCurrentPresetChange: return .cancel(id: CancelId.monitorCurrentPreset)
-      case .updateForCurrentPresetChange(let preset): return updateForCurrentPresetChange(&state, preset: preset)
       case .updateButtonTapped: return updateTapped(&state)
       }
     }
   }
 
+  public init() {}
+
   enum CancelId {
     case monitorCurrentPreset
   }
+}
 
-  public func setSource(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
-    state.source = source
-    state.factoryPresets = source.factoryPresetsNonNil
-    state.userPresets = source.userPresets
-    return .concatenate(
-      factoryPresetPicked(&state, index: 0),
-      .run { send in
-        await Self.monitorCurrentPreset(source: source, send: send)
-      }.cancellable(id: CancelId.monitorCurrentPreset)
-    )
-  }
-
-  private static func monitorCurrentPreset(source: AUAudioUnit, send: Send<Action>) async {
-    let log = OSLog(subsystem: "AUV3Controls.KnobFeature", category: "PresetsFeature")
-    os_log(.info, log: log, "run: setSource")
-    var lastValue: Int?
-    for await value in source.publisher(for: \.currentPreset, options: [.initial, .new])
-      .buffer(size: 1, prefetch: .byRequest, whenFull: .dropOldest)
-      .values {
-      if lastValue != value?.number {
-        lastValue = value?.number
-        os_log(.info, log: log, "run: saw change - %{public}d", lastValue ?? 999)
-        await send(.updateForCurrentPresetChange(lastValue))
-      }
-    }
-    os_log(.info, log: log, "run: publisher finsished")
-  }
-
-  private func updateForCurrentPresetChange(_ state: inout State, preset: Int?) -> Effect<Action> {
-    // When the audio unit current preset is cleared, do the same with our view of it.
-    print("updateForCurrentPresetChange: \(String(describing: preset))")
-    return preset == nil ? clearCurrentPreset(&state) : .none
-  }
+extension PresetsFeature {
 
   private func clearPrompt(_ state: inout State) {
     state.activePrompt = .init(prompt: .none, name: "")
   }
 
-  private func clearCurrentPreset(_ state: inout State) -> Effect<Action> {
-    state.currentPresetNumber = state.unsetPresetNumber
-    state.currentPresetName = state.unsetPresetName
-    return .none.animation()
+  private func currentPresetChanged(_ state: inout State, preset: Int?) -> Effect<Action> {
+    // When the audio unit current preset is cleared, do the same with our view of it.
+    if preset == nil {
+      state.currentPresetNumber = state.unsetPresetNumber
+      state.currentPresetName = state.unsetPresetName
+      return .none.animation()
+    }
+    return .none
   }
 
   private func deleteButtonTapped(_ state: inout State) -> Effect<Action> {
@@ -202,17 +178,29 @@ public struct PresetsFeature {
     return .none
   }
 
-  private func promptCancelButtonTapped(_ state: inout State) -> Effect<Action> {
-    clearPrompt(&state)
+  private func factoryPresetPicked(_ state: inout State, index: Int) -> Effect<Action> {
+    state.currentPresetNumber = state.find(number: index)?.number ?? state.unsetPresetNumber
     return .none.animation()
   }
 
-  private func promptTextChanged(_ state: inout State, value: String) -> Effect<Action> {
-    state.activePrompt.name = value
+  private func monitorCurrentPresetChange(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
+    .run { send in
+      var lastValue: AUAudioUnitPreset?
+      await objectPropertyStream(for: source, on: \.currentPreset) {
+        if $0 != lastValue {
+          await send(.currentPresetChanged($0?.number))
+          lastValue = $0
+        }
+      }
+    }.cancellable(id: CancelId.monitorCurrentPreset)
+  }
+
+  private func newButtonTapped(_ state: inout State) -> Effect<Action> {
+    state.activePrompt = .init(prompt: .askForNewName, name: state.currentPresetName)
     return .none
   }
 
-  private func doNew(_ state: inout State) -> Effect<Action> {
+  private func newPresetRequested(_ state: inout State) -> Effect<Action> {
     if let source = state.source {
       let preset = AUAudioUnitPreset(number: state.nextUserPresetNumber, name: state.activePrompt.name)
       try? source.saveUserPreset(preset)
@@ -223,7 +211,29 @@ public struct PresetsFeature {
     return .none.animation()
   }
 
-  private func doRename(_ state: inout State) -> Effect<Action> {
+  private func presetNumberSelected(_ state: inout State, number: Int) -> Effect<Action> {
+    state.currentPresetNumber = state.find(number: number)?.number ?? state.unsetPresetNumber
+    return .none.animation()
+  }
+
+  private func promptCancelButtonTapped(_ state: inout State) -> Effect<Action> {
+    clearPrompt(&state)
+    return .none.animation()
+  }
+
+  private func promptTextChanged(_ state: inout State, value: String) -> Effect<Action> {
+    state.activePrompt.name = value
+    return .none
+  }
+
+  private func renameButtonTapped(_ state: inout State) -> Effect<Action> {
+    if let preset = state.currentPreset, preset.number < 0 {
+      state.activePrompt = .init(prompt: .askForRename, name: state.currentPresetName)
+    }
+    return .none
+  }
+
+  private func renamePresetRequested(_ state: inout State) -> Effect<Action> {
     if let source = state.source,
        let preset = state.currentPreset {
       let new = AUAudioUnitPreset(number: preset.number, name: state.activePrompt.name)
@@ -237,26 +247,14 @@ public struct PresetsFeature {
     return .none.animation()
   }
 
-  private func factoryPresetPicked(_ state: inout State, index: Int) -> Effect<Action> {
-    state.currentPresetNumber = state.find(number: index)?.number ?? state.unsetPresetNumber
-    return .none.animation()
-  }
-
-  private func newButtonTapped(_ state: inout State) -> Effect<Action> {
-    state.activePrompt = .init(prompt: .askForNewName, name: state.currentPresetName)
-    return .none
-  }
-
-  private func presetNumberSelected(_ state: inout State, number: Int) -> Effect<Action> {
-    state.currentPresetNumber = state.find(number: number)?.number ?? state.unsetPresetNumber
-    return .none.animation()
-  }
-
-  private func renameTapped(_ state: inout State) -> Effect<Action> {
-    if let preset = state.currentPreset, preset.number < 0 {
-      state.activePrompt = .init(prompt: .askForRename, name: state.currentPresetName)
-    }
-    return .none
+  private func setSource(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
+    state.source = source
+    state.factoryPresets = source.factoryPresetsNonNil
+    state.userPresets = source.userPresets
+    return .concatenate(
+      factoryPresetPicked(&state, index: 0),
+      monitorCurrentPresetChange(&state, source: source)
+    )
   }
 
   private func updateTapped(_ state: inout State) -> Effect<Action> {
@@ -268,8 +266,6 @@ public struct PresetsFeature {
     }
     return .none
   }
-
-  public init() {}
 }
 
 private class FakeSource: AUAudioUnit, @unchecked Sendable {

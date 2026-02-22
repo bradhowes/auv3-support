@@ -48,7 +48,7 @@ public struct PresetsMenu: View {
         store.send(.promptCancelButtonTapped)
       }
       Button("OK") {
-        store.send(store.activePrompt.prompt == .askForNewName ? .doNew : .doRename)
+        store.send(store.activePrompt.prompt == .askForNewName ? .newPresetRequested : .renamePresetRequested)
       }
       .disabled(store.activePrompt.name.isEmpty)
     }
