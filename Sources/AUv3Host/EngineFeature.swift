@@ -47,9 +47,11 @@ public struct EngineFeature {
       case .playButtonTapped:
         state.isPlaying = engine.startStop()
         if !state.isPlaying {
-          state.isBypassed = false
+          withAnimation(.smooth) {
+            state.isBypassed = false
+          }
         }
-        return .none.animation()
+        return .none
       }
     }
   }

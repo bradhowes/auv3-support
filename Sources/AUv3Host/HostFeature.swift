@@ -70,19 +70,19 @@ public struct HostFeature {
 
     Reduce { state, action in
       switch action {
-      case .bypassButtonTapped: return reduce(into: &state, action: .engine(.bypassButtonTapped))
-      case .deleteButtonTapped: return reduce(into: &state, action: .presets(.deleteButtonTapped))
+      case .bypassButtonTapped: return .send(.engine(.bypassButtonTapped))
+      case .deleteButtonTapped: return .send(.presets(.deleteButtonTapped))
       case .dismissNotice: return dismissNotice(&state)
       case .engine: return .none
       case .loader(.delegate(.failed(let error))): return loaderFailed(&state, error: error)
       case .loader(.delegate(.found(let success))): return loaderFoundComponent(&state, payload: success)
       case .loader: return .none
-      case .newButtonTapped: return reduce(into: &state, action: .presets(.newButtonTapped))
-      case .playButtonTapped: return reduce(into: &state, action: .engine(.playButtonTapped))
-      case .presetButtonTapped(let number): return reduce(into: &state, action: .presets(.presetNumberSelected(number)))
+      case .newButtonTapped: return .send(.presets(.newButtonTapped))
+      case .playButtonTapped: return .send(.engine(.playButtonTapped))
+      case .presetButtonTapped(let number): return .send(.presets(.presetNumberSelected(number)))
       case .presets: return .none
-      case .renameButtonTapped: return reduce(into: &state, action: .presets(.renameButtonTapped))
-      case .updateButtonTapped: return reduce(into: &state, action: .presets(.updateButtonTapped))
+      case .renameButtonTapped: return .send(.presets(.renameButtonTapped))
+      case .updateButtonTapped: return .send(.presets(.updateButtonTapped))
       case .versionButtonTapped: return visitAppStore(&state)
       }
     }
@@ -94,9 +94,11 @@ public struct HostFeature {
 extension HostFeature {
 
   private func dismissNotice(_ state: inout State) -> Effect<Action> {
-    state.showNotice = false
-    state.failureError = nil
-    return .none.animation()
+    withAnimation {
+      state.showNotice = false
+      state.failureError = nil
+    }
+    return .none
   }
 
   private func loaderFailed(_ state: inout State, error: AudioUnitLoaderError) -> Effect<Action> {
@@ -113,8 +115,8 @@ extension HostFeature {
     }
 
     return .merge(
-      reduce(into: &state, action: .engine(.connectEffect(payload.audioUnit, state.sampleLoop))),
-      reduce(into: &state, action: .presets(.setSource(payload.audioUnit.auAudioUnit)))
+      .send(.engine(.connectEffect(payload.audioUnit, state.sampleLoop))),
+      .send(.presets(.setSource(payload.audioUnit.auAudioUnit)))
     )
   }
 

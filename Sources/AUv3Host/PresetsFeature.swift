@@ -160,9 +160,10 @@ extension PresetsFeature {
   private func currentPresetChanged(_ state: inout State, preset: Int?) -> Effect<Action> {
     // When the audio unit current preset is cleared, do the same with our view of it.
     if preset == nil {
-      state.currentPresetNumber = state.unsetPresetNumber
-      state.currentPresetName = state.unsetPresetName
-      return .none.animation()
+      withAnimation {
+        state.currentPresetNumber = state.unsetPresetNumber
+        state.currentPresetName = state.unsetPresetName
+      }
     }
     return .none
   }
@@ -179,8 +180,10 @@ extension PresetsFeature {
   }
 
   private func factoryPresetPicked(_ state: inout State, index: Int) -> Effect<Action> {
-    state.currentPresetNumber = state.find(number: index)?.number ?? state.unsetPresetNumber
-    return .none.animation()
+    withAnimation {
+      state.currentPresetNumber = state.find(number: index)?.number ?? state.unsetPresetNumber
+    }
+    return .none
   }
 
   private func monitorCurrentPresetChange(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
@@ -202,23 +205,29 @@ extension PresetsFeature {
 
   private func newPresetRequested(_ state: inout State) -> Effect<Action> {
     if let source = state.source {
-      let preset = AUAudioUnitPreset(number: state.nextUserPresetNumber, name: state.activePrompt.name)
-      try? source.saveUserPreset(preset)
-      state.userPresets.append(preset)
-      state.currentPresetNumber = preset.number
-      clearPrompt(&state)
+      withAnimation {
+        let preset = AUAudioUnitPreset(number: state.nextUserPresetNumber, name: state.activePrompt.name)
+        try? source.saveUserPreset(preset)
+        state.userPresets.append(preset)
+        state.currentPresetNumber = preset.number
+        clearPrompt(&state)
+      }
     }
-    return .none.animation()
+    return .none
   }
 
   private func presetNumberSelected(_ state: inout State, number: Int) -> Effect<Action> {
-    state.currentPresetNumber = state.find(number: number)?.number ?? state.unsetPresetNumber
-    return .none.animation()
+    withAnimation {
+      state.currentPresetNumber = state.find(number: number)?.number ?? state.unsetPresetNumber
+    }
+    return .none
   }
 
   private func promptCancelButtonTapped(_ state: inout State) -> Effect<Action> {
-    clearPrompt(&state)
-    return .none.animation()
+    withAnimation {
+      clearPrompt(&state)
+    }
+    return .none
   }
 
   private func promptTextChanged(_ state: inout State, value: String) -> Effect<Action> {
@@ -234,17 +243,19 @@ extension PresetsFeature {
   }
 
   private func renamePresetRequested(_ state: inout State) -> Effect<Action> {
-    if let source = state.source,
-       let preset = state.currentPreset {
-      let new = AUAudioUnitPreset(number: preset.number, name: state.activePrompt.name)
-      try? source.deleteUserPreset(preset)
-      try? source.saveUserPreset(new)
-      state.userPresets.removeAll { $0.number == preset.number }
-      state.userPresets.append(new)
-      state.currentPresetNumber = new.number
+    withAnimation {
+      if let source = state.source,
+         let preset = state.currentPreset {
+        let new = AUAudioUnitPreset(number: preset.number, name: state.activePrompt.name)
+        try? source.deleteUserPreset(preset)
+        try? source.saveUserPreset(new)
+        state.userPresets.removeAll { $0.number == preset.number }
+        state.userPresets.append(new)
+        state.currentPresetNumber = new.number
+      }
+      clearPrompt(&state)
     }
-    clearPrompt(&state)
-    return .none.animation()
+    return .none
   }
 
   private func setSource(_ state: inout State, source: AUAudioUnit) -> Effect<Action> {
