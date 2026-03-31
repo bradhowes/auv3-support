@@ -1,7 +1,6 @@
 // Copyright © 2020, 2024 Brad Howes. All rights reserved.
 
 import AudioToolbox
-import Numerics
 
 @testable import AUv3Component
 import Testing
@@ -82,7 +81,7 @@ private final class Context {
   let param = ctx.params[2]
   param.setParametricValue(value)
   #expect(param.value == 144.35028)
-  #expect(param.parametricValue.value.isApproximatelyEqual(to: 0.5))
+  #expect(abs(param.parametricValue.value - 0.5) < 0.00001)
 }
 
 @Test func testParametricSquareRootTransforms() {

@@ -14,7 +14,6 @@ let package = Package(
     .package(url: "https://github.com/bradhowes/brh-segmented-control", from: "1.0.5"),
     .package(url: "https://github.com/bradhowes/DSPHeaders", from: "1.1.0"),
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-    .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.0"),
     // .package(path: "../DSPHeaders")
   ],
@@ -83,8 +82,7 @@ let package = Package(
       name: "AUv3ComponentTests",
       dependencies: [
         "AUv3Component",
-        .product(name: "DSPHeaders", package: "DSPHeaders"),
-        .product(name: "Numerics", package: "swift-numerics")
+        .product(name: "DSPHeaders", package: "DSPHeaders")
       ],
       swiftSettings: [
         .define("APPLICATION_EXTENSION_API_ONLY"),

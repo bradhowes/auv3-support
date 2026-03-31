@@ -11,8 +11,7 @@ test-iOS:
 	USE_UNSAFE_FLAGS="1" set -o pipefail && xcodebuild test \
 		$(BUILD_FLAGS) \
 		-derivedDataPath "$(PWD)/.DerivedData-iOS" \
-		-destination platform="$(PLATFORM_IOS)" \
-		| xcbeautify --renderer github-actions
+		-destination platform="$(PLATFORM_IOS)"
 
 coverage-iOS: test-iOS
 	$(XCCOV) $(PWD)/.DerivedData-iOS/Logs/Test/*.xcresult > coverage_iOS.txt
@@ -29,8 +28,7 @@ test-macOS:
 	USE_UNSAFE_FLAGS="1" set -o pipefail && xcodebuild test \
 		$(BUILD_FLAGS) \
 		-derivedDataPath "$(PWD)/.DerivedData-macOS" \
-		-destination platform="$(PLATFORM_MACOS)" \
-		| xcbeautify --renderer github-actions
+		-destination platform="$(PLATFORM_MACOS)"
 
 coverage-macOS: test-macOS
 	$(XCCOV) $(PWD)/.DerivedData-macOS/Logs/Test/*.xcresult > coverage_macOS.txt
